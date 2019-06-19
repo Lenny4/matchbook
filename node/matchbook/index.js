@@ -3,6 +3,7 @@ const app = express();
 const server = require('http').createServer(app);
 const io = require('../')(server);
 const port = process.env.PORT || 3000;
+const conf = require('./conf.js');
 
 server.listen(port, () => {
     console.log('Server listening at port %d', port);
@@ -17,6 +18,6 @@ io.on('connection', (socket) => {
     });
 });
 
-app.post('/get-info-from-node', function (req, res) {
+app.post('/get-strategies', function (req, res) {
 
 });
