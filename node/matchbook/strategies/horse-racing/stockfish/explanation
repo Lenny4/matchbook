@@ -1,1 +1,4 @@
-Explication de comment marche la stratégie
+Stratégie basé sur la différence des cotes.
+On place un lay bien avant le début de la course ~ 20min à 30min.
+Puis on suppose que la cote va monter et on place un pari quand la cote a augmenté jusqu'à une certaine valeur prédéfini.
+Si la valeur n'est jamais atteinte place le pari juste au début de la course pour limiter les pertes.

@@ -2,5 +2,3 @@
 // plus on a de l'argent par rapport à la totalité des matchs totals plus le chiffre peut être bas
 // car il n'y aura pas de problème d'exposure ou de manque de stack
 // faire tout de même attention au grosses cotes > 15
-
-// difference between lay and back to bet |exemple: 0.2|
