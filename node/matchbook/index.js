@@ -3,8 +3,8 @@ const app = express();
 const server = require('http').createServer(app);
 const io = require('../')(server);
 const port = process.env.PORT || 3000;
-const Conf = require('./conf.js').Conf;
-const Const = require('./const.js').Const;
+const Env = require('./Env.js').Env;
+const Const = require('./Const.js').Const;
 
 server.listen(port, () => {
     console.log('Server listening at port %d', port);

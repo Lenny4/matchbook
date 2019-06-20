@@ -3,9 +3,9 @@ const $ = require('jquery');
 global.$ = global.jQuery = $;
 require('bootstrap');
 const io = require('socket.io-client');
-const Conf = require('./Conf.js').Conf;
+const Env = require('./Env.js').Env;
 const Const = require('./Const.js').Const;
-const socketServer = Conf.NODE_URL;
+const socketServer = Env.NODE_URL;
 
 $(document).ready(function () {
     $("body").tooltip({
