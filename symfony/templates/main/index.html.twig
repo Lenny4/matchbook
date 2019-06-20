@@ -9,8 +9,8 @@
                aria-controls="pills-dashboard" aria-selected="true">Dashboard</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="pills-watch-tab" data-toggle="pill" href="#pills-watch" role="tab"
-               aria-controls="pills-watch" aria-selected="false">Watch</a>
+            <a class="nav-link" id="pills-importer-tab" data-toggle="pill" href="#pills-importer" role="tab"
+               aria-controls="pills-importer" aria-selected="false">Importer</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" id="pills-backtest-tab" data-toggle="pill" href="#pills-backtest" role="tab"
@@ -21,11 +21,11 @@
                aria-controls="pills-strategies" aria-selected="false">Strategies</a>
         </li>
     </ul>
-    <div class="tab-content" id="pills-main-nav">
+    <div class="tab-content" id="nav-main">
         <div class="tab-pane fade show active" id="pills-dashboard" role="tabpanel"
              aria-labelledby="pills-dashboard-tab">{{ include('main/pages/dashboard.html.twig') }}</div>
-        <div class="tab-pane fade" id="pills-watch" role="tabpanel"
-             aria-labelledby="pills-watch-tab">{{ include('main/pages/watch.html.twig') }}</div>
+        <div class="tab-pane fade" id="pills-importer" role="tabpanel"
+             aria-labelledby="pills-importer-tab">{{ include('main/pages/importer.html.twig') }}</div>
         <div class="tab-pane fade" id="pills-backtest" role="tabpanel"
              aria-labelledby="pills-backtest-tab">{{ include('main/pages/backtest.html.twig') }}</div>
         <div class="tab-pane fade" id="pills-strategies" role="tabpanel"

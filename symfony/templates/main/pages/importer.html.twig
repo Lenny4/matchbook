@@ -1,0 +1,14 @@
+<nav>
+    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <a class="nav-item nav-link active" id="nav-import-tab" data-toggle="tab" href="#nav-import" role="tab"
+           aria-controls="nav-import" aria-selected="true">Import</a>
+        <a class="nav-item nav-link" id="nav-importing-tab" data-toggle="tab" href="#nav-importing" role="tab"
+           aria-controls="nav-importing" aria-selected="false">Importing</a>
+    </div>
+</nav>
+<div class="tab-content" id="nav-importer">
+    <div class="tab-pane fade show active" id="nav-import" role="tabpanel"
+         aria-labelledby="nav-import-tab">{{ include('main/pages/importer/import.html.twig') }}</div>
+    <div class="tab-pane fade" id="nav-importing" role="tabpanel"
+         aria-labelledby="nav-importing-tab">{{ include('main/pages/importer/importing.html.twig') }}</div>
+</div>
