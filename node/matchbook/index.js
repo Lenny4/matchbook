@@ -3,8 +3,8 @@ const app = express();
 const server = require('http').createServer(app);
 const io = require('../')(server);
 const port = process.env.PORT || 3000;
-const Conf = require('./conf.js');
-const Const = require('./const.js');
+const Conf = require('./conf.js').Conf;
+const Const = require('./const.js').Const;
 
 server.listen(port, () => {
     console.log('Server listening at port %d', port);
@@ -15,7 +15,8 @@ server.listen(port, () => {
 
 
 io.on('connection', (socket) => {
-    socket.on('event', (data) => {
+    socket.on('event', function (data, fn) {
+        fn(true);
     });
 });
 
