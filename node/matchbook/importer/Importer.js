@@ -1,4 +1,5 @@
-const Importer = {};
+function Importer() {
+}
 
 module.exports = {
     Importer,

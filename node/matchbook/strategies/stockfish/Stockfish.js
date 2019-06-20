@@ -1,4 +1,5 @@
-const Stockfish = {};
+function Stockfish() {
+}
 
 module.exports = {
     Stockfish,

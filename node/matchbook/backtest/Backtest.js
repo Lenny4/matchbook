@@ -1,4 +1,5 @@
-const Backtest = {};
+function Backtest() {
+}
 
 module.exports = {
     Backtest,

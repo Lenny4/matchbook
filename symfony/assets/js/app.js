@@ -5,7 +5,10 @@ require('bootstrap');
 const io = require('socket.io-client');
 const Env = require('./Env.js').Env;
 const Const = require('./Const.js').Const;
-const socketServer = Env.NODE_URL;
+
+const env = new Env();
+const constante = new Const();
+const socketServer = env.NODE_URL;
 
 $(document).ready(function () {
     $("body").tooltip({
@@ -13,7 +16,9 @@ $(document).ready(function () {
     });
 
     const socket = io(socketServer);
-    // socket.emit('event', {}, function (result) {
-    //
-    // });
+    socket.on('login', function () {
+        socket.emit('login_back', account, function (result) {
+            console.log("login result", result);
+        });
+    });
 });

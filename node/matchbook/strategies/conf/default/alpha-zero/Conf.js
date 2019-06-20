@@ -1,7 +1,5 @@
-const Conf = {
-    minOddAccuracy: 1,
-    minOddValue: 1.5,
-};
+function Conf() {
+}
 
 module.exports = {
     Conf,

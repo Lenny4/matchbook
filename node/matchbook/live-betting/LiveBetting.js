@@ -1,4 +1,5 @@
-const LiveBetting = {};
+function LiveBetting() {
+}
 
 module.exports = {
     LiveBetting,

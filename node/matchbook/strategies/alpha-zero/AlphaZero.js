@@ -1,4 +1,5 @@
-const AlphaZero = {};
+function AlphaZero() {
+}
 
 module.exports = {
     AlphaZero,

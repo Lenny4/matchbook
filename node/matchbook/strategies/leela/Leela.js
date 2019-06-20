@@ -1,4 +1,5 @@
-const Leela = {};
+function Leela() {
+}
 
 module.exports = {
     Leela,

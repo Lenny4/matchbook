@@ -1,4 +1,5 @@
-const Conf = {};
+function Conf() {
+}
 
 module.exports = {
     Conf,

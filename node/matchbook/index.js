@@ -10,6 +10,11 @@ const scrapeIt = require("scrape-it");
 const Env = require('./Env.js').Env;
 const Const = require('./Const.js').Const;
 const SymfonyApi = require('./symfony-api/SymfonyApi.js').SymfonyApi;
+const MatchbookApi = require('./matchbook-api/MatchbookApi.js').MatchbookApi;
+
+const env = new Env();
+const constante = new Const();
+const symfonyApi = new SymfonyApi(env.SYMFONY_URL);
 
 server.listen(port, () => {
     console.log('Server listening at port %d', port);
@@ -30,7 +35,15 @@ server.listen(port, () => {
 });
 
 io.on('connection', (socket) => {
-    socket.on('event', function (data, fn) {
+
+    console.log('Logging to matchbook API ...');
+    const matchbookApi = new MatchbookApi();
+    socket.emit('login', {}, function (result) {
+    });
+    socket.on('login_back', function (data, fn) {
+        matchbookApi.username = data.username;
+        matchbookApi.password = data.password;
+        //TODO start login
         fn(true);
     });
 });
