@@ -1,11 +1,14 @@
-function Const() {
+const Const = {
     // Account
-    this.USERNAME = "matchibc45";
-    this.PASSWORD = "Computer210496,";
+    USERNAME: "matchibc45",
+    PASSWORD: "Computer210496,",
     // Exchange
-    this.EXCHANGE_TYPE_BACK = "back";
-    this.EXCHANGE_TYPE_LAY = "lay";
-}
+    EXCHANGE_TYPE_BACK: "back",
+    EXCHANGE_TYPE_LAY: "lay",
+    // Env
+    DEV: "dev",
+    PROD: "prod",
+};
 
 module.exports = {
     Const,

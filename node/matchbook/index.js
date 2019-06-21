@@ -9,13 +9,11 @@ const scrapeIt = require("scrape-it");
 
 const Env = require('./Env.js').Env;
 const Const = require('./Const.js').Const;
-const SymfonyApi = require('./symfony-api/SymfonyApi.js').SymfonyApi;
-const MatchbookApi = require('./matchbook-api/MatchbookApi.js').MatchbookApi;
+const SymfonyApi = require('./class/SymfonyApi.js').SymfonyApi;
+const MatchbookApi = require('./class/MatchbookApi.js').MatchbookApi;
 
-const env = new Env();
-const constante = new Const();
-const symfonyApi = new SymfonyApi(env.SYMFONY_URL);
-const matchbookApi = new MatchbookApi(constante.USERNAME, constante.PASSWORD);
+const symfonyApi = new SymfonyApi(Env.SYMFONY_URL);
+const matchbookApi = new MatchbookApi(Const.USERNAME, Const.PASSWORD, Env.APP_ENV);
 
 function init() {
     console.log('\033[2J');
@@ -27,15 +25,21 @@ function init() {
         if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && typeof data !== "undefined" && typeof data.country !== "undefined") {
             if (data.country === "Finland") {
                 console.log('Your are in Finland !');
-                //TODO if APP_ENV === dev try to auto configure matchbookAPI, store session token in code and check with getSession if token is still active else get new one
-                matchbookApi.login(function (result) {
-                    if (result === false) {
-                        console.log("Error while starting server starting back in 30s");
-                        setTimeout(function () {
-                            init();
-                        }, 30000);
-                    }
-                });
+                if (Env.APP_ENV === Const.DEV) {
+                    //TODO définir soit meme les variables de matchbookApi
+                    console.log("TODO env dev...");
+                } else if (Env.APP_ENV === Const.PROD) {
+                    matchbookApi.login(function (result) {
+                        if (result === false) {
+                            console.log("Error while starting server starting back in 30s");
+                            setTimeout(function () {
+                                init();
+                            }, 30000);
+                        }
+                    });
+                } else {
+                    throw new Error('APP_ENV can only be "prod" or "dev"');
+                }
             } else {
                 console.log('Your are not located in Finland');
             }

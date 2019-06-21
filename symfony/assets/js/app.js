@@ -6,9 +6,7 @@ const io = require('socket.io-client');
 const Env = require('./Env.js').Env;
 const Const = require('./Const.js').Const;
 
-const env = new Env();
-const constante = new Const();
-const socketServer = env.NODE_URL;
+const socketServer = Env.NODE_URL;
 
 $(document).ready(function () {
     $("body").tooltip({
