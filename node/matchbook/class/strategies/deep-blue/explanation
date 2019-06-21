@@ -20,5 +20,5 @@ Paramètres:
     exemple: fluctuation = 0.05
     Si la cote du lay est à 4.2
     cote du back à atteindre pour placer le pari:
-    (4.2 * 0.05) + 4.2 = 4.41
+    (4.2 * 0.04) + 4.2 = 4.368 -> 4.4 ou 4.3 en fonction de comment on code
 

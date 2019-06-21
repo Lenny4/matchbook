@@ -14,6 +14,7 @@ function MatchbookApi(username, password, env) {
     // urls
     this.GetSessionUrl = 'https://api.matchbook.com/bpapi/rest/security/session';
     this.Login = 'https://api.matchbook.com/bpapi/rest/security/session';
+    this.GetSports = 'https://api.matchbook.com/edge/rest/lookups/sports';
 
     this.login = function (env, callback) {
         const $this = this;
@@ -92,6 +93,35 @@ function MatchbookApi(username, password, env) {
                     console.log(error);
                 } else {
                     console.log('Generating new token KO !', response.statusCode);
+                }
+            }
+        });
+    };
+
+    this.getSports = function (callback) {
+        const $this = this;
+        console.log('Getting all sports ...');
+        const options = {
+            method: 'GET',
+            url: $this.GetSports,
+            qs: {
+                offset: '0',
+                'per-page': '100',
+                order: 'name asc',
+                status: 'active'
+            },
+            headers: $this.headers,
+        };
+        request(options, function (error, response, body) {
+            if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
+                callback(JSON.parse(body)['sports']);
+                console.log('Get Sports OK !', response.statusCode);
+            } else {//error
+                callback(false);
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Get Sports KO !', response.statusCode);
                 }
             }
         });

@@ -57,6 +57,12 @@ io.on('connection', (socket) => {
             fn(result);
         });
     });
+
+    socket.on('get_sports', function (data, fn) {
+        matchbookApi.getSports(function (result) {
+            fn(result);
+        });
+    });
 });
 
 app.post('/get-strategies', function (req, res) {
