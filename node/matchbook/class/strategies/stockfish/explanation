@@ -1,7 +1,15 @@
-Stratégie basé sur la différence des cotes.
+Stratégie basé sur l'offre et la demande.
 On place un lay bien avant le début de la course ~ 20min à 30min.
-Puis on suppose que la cote va monter et on place un pari quand la cote a augmenté jusqu'à une certaine valeur prédéfini.
-Si la valeur n'est jamais atteinte place le pari juste au début de la course pour limiter les pertes.
+On suppose que la cote va monter et donc on suppose que la tendance sera à la hausse.
+On analyse le stack d'argent parié sur les différentes cotes pour avoir la tendance.
+
+Dans la cas ou la tendance est à la hausse dans les minutes qui viennent:
+- Dès que la tendance passe à la baisse on place le pari.
+
+Dans la cas ou la tendance est à la baisse dans les minutes qui viennent:
+- Alpha Zero attendra que la tendance passe à la hausse puis passe place le pari quand la tendance arrivera à la baisse
+- Si la tendance ne passe jamais à la hausse place le pari juste avant le début du match pour limiter les pertes
+
 
 Paramètres:
 - minOddAccuracy:
