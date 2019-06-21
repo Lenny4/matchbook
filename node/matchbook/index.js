@@ -25,11 +25,9 @@ function init() {
         if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && typeof data !== "undefined" && typeof data.country !== "undefined") {
             if (data.country === "Finland") {
                 console.log('Your are in Finland !');
-                if (Env.APP_ENV === Const.DEV) {
-                    //TODO définir soit meme les variables de matchbookApi
-                    console.log("TODO env dev...");
-                } else if (Env.APP_ENV === Const.PROD) {
-                    matchbookApi.login(function (result) {
+                if (Env.APP_ENV === Const.DEV || Env.APP_ENV === Const.PROD) {
+                    if (Env.APP_ENV === Const.DEV) matchbookApi.headers['session-token'] = Env.DEV_SESSION_TOKEN;
+                    matchbookApi.login(Env.APP_ENV, function (result) {
                         if (result === false) {
                             console.log("Error while starting server starting back in 30s");
                             setTimeout(function () {
@@ -38,7 +36,7 @@ function init() {
                         }
                     });
                 } else {
-                    throw new Error('APP_ENV can only be "prod" or "dev"');
+                    console.log('APP_ENV can only be "prod" or "dev", please change and restart server');
                 }
             } else {
                 console.log('Your are not located in Finland');
