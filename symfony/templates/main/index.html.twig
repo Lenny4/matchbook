@@ -21,6 +21,10 @@
             <a class="nav-link" id="pills-strategies-tab" data-toggle="pill" href="#pills-strategies" role="tab"
                aria-controls="pills-strategies" aria-selected="false">Strategies</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" id="pills-dev-tab" data-toggle="pill" href="#pills-dev" role="tab"
+               aria-controls="pills-dev" aria-selected="false">Dev</a>
+        </li>
     </ul>
     <div class="tab-content" id="nav-main">
         <div class="tab-pane fade show active" id="pills-dashboard" role="tabpanel"
@@ -31,5 +35,7 @@
              aria-labelledby="pills-backtest-tab">{{ include('main/pages/backtest.html.twig') }}</div>
         <div class="tab-pane fade" id="pills-strategies" role="tabpanel"
              aria-labelledby="pills-strategies-tab">{{ include('main/pages/strategies.html.twig') }}</div>
+        <div class="tab-pane fade" id="pills-dev" role="tabpanel"
+             aria-labelledby="pills-dev-tab">{{ include('main/pages/dev.html.twig') }}</div>
     </div>
 {% endblock %}

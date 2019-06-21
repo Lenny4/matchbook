@@ -68,7 +68,34 @@ function MatchbookApi(username, password, env) {
                 }
             });
         }
-    }
+    };
+
+    this.generateNewTokenDev = function (callback) {
+        const $this = this;
+        console.log('Generating new token for dev ...');
+        const options = {
+            method: 'POST',
+            url: $this.Login,
+            json: {
+                "username": $this.username,
+                "password": $this.password
+            },
+            headers: $this.headers,
+        };
+        request(options, function (error, response, body) {
+            if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
+                callback(body['session-token']);
+                console.log('Generating new token OK !', response.statusCode, "token", body['session-token']);
+            } else {//error
+                callback(false);
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Generating new token KO !', response.statusCode);
+                }
+            }
+        });
+    };
 }
 
 module.exports = {

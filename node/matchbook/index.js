@@ -13,7 +13,7 @@ const SymfonyApi = require('./class/SymfonyApi.js').SymfonyApi;
 const MatchbookApi = require('./class/MatchbookApi.js').MatchbookApi;
 
 const symfonyApi = new SymfonyApi(Env.SYMFONY_URL);
-const matchbookApi = new MatchbookApi(Const.USERNAME, Const.PASSWORD, Env.APP_ENV);
+const matchbookApi = new MatchbookApi(Env.USERNAME, Env.PASSWORD, Env.APP_ENV);
 
 function init() {
     console.log('\033[2J');
@@ -52,10 +52,11 @@ server.listen(port, () => {
 });
 
 io.on('connection', (socket) => {
-    // socket.emit('login', {}, function (result) {
-    // });
-    // socket.on('login_back', function (data, fn) {
-    // });
+    socket.on('generate_new_token_dev', function (data, fn) {
+        matchbookApi.generateNewTokenDev(function (result) {
+            fn(result);
+        });
+    });
 });
 
 app.post('/get-strategies', function (req, res) {
