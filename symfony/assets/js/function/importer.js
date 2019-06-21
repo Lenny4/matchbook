@@ -14,7 +14,12 @@ function manageAfterValue() {
     $("#after-sport").val(parseInt(Date.now() / 1000));
 }
 
+function displayEvents(events) {
+    console.log(events);
+}
+
 module.exports = {
     addAllSportsToSelectDom,
     manageAfterValue,
+    displayEvents,
 };

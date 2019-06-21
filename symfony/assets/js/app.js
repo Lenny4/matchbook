@@ -33,7 +33,12 @@ $(document).ready(function () {
 
     $(document).on("submit", "form", function (e) {
         e.preventDefault();
-        const data = $(this).serializeArray();
-        //TODO send data to node
+        const form = $(this).serializeArray();
+        const submitButton = $(this).find("[type=submit]");
+        $(submitButton).prop('disabled', true);
+        socket.emit('get_events', form, function (result) {
+            $(submitButton).prop('disabled', false);
+            importer.displayEvents(result.events);
+        });
     });
 });

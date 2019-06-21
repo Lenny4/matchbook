@@ -13,8 +13,9 @@ function MatchbookApi(username, password, env) {
     }
     // urls
     this.GetSessionUrl = 'https://api.matchbook.com/bpapi/rest/security/session';
-    this.Login = 'https://api.matchbook.com/bpapi/rest/security/session';
-    this.GetSports = 'https://api.matchbook.com/edge/rest/lookups/sports';
+    this.LoginUrl = 'https://api.matchbook.com/bpapi/rest/security/session';
+    this.GetSportsUrl = 'https://api.matchbook.com/edge/rest/lookups/sports';
+    this.getEventsUrl = 'https://api.matchbook.com/edge/rest/events';
 
     this.login = function (env, callback) {
         const $this = this;
@@ -22,7 +23,7 @@ function MatchbookApi(username, password, env) {
         if (env === Const.PROD) { // prod
             const options = {
                 method: 'POST',
-                url: $this.Login,
+                url: $this.LoginUrl,
                 json: {
                     "username": $this.username,
                     "password": $this.password
@@ -76,7 +77,7 @@ function MatchbookApi(username, password, env) {
         console.log('Generating new token for dev ...');
         const options = {
             method: 'POST',
-            url: $this.Login,
+            url: $this.LoginUrl,
             json: {
                 "username": $this.username,
                 "password": $this.password
@@ -103,7 +104,7 @@ function MatchbookApi(username, password, env) {
         console.log('Getting all sports ...');
         const options = {
             method: 'GET',
-            url: $this.GetSports,
+            url: $this.GetSportsUrl,
             qs: {
                 offset: '0',
                 'per-page': '100',
@@ -122,6 +123,45 @@ function MatchbookApi(username, password, env) {
                     console.log(error);
                 } else {
                     console.log('Get Sports KO !', response.statusCode);
+                }
+            }
+        });
+    };
+
+    this.getEvents = function (data, callback) {
+        const $this = this;
+        console.log('Getting Events ...', data);
+        const after = data.find(x => x.name === "after").value;
+        const before = parseInt(after) + (3600 * 24 * 3);//3 days
+        const options = {
+            method: 'GET',
+            url: $this.getEventsUrl,
+            qs: {
+                offset: '0',
+                'per-page': '100',
+                after: after,
+                before: before.toString(),
+                'sport-ids': data.find(x => x.name === "sport-ids").value,
+                'exchange-type': 'back-lay',
+                'odds-type': 'DECIMAL',
+                'include-prices': 'false',
+                'price-depth': '5',
+                'price-mode': 'expanded',
+                'minimum-liquidity': '10',
+                'include-event-participants': 'false'
+            },
+            headers: $this.headers,
+        };
+        request(options, function (error, response, body) {
+            if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
+                callback(JSON.parse(body));
+                console.log('Get Events OK !', response.statusCode);
+            } else {//error
+                callback(false);
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Get Events KO !', response.statusCode);
                 }
             }
         });

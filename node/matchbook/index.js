@@ -63,6 +63,12 @@ io.on('connection', (socket) => {
             fn(result);
         });
     });
+
+    socket.on('get_events', function (data, fn) {
+        matchbookApi.getEvents(data, function (result) {
+            fn(result);
+        });
+    });
 });
 
 app.post('/get-strategies', function (req, res) {
