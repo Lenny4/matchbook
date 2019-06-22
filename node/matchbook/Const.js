@@ -1,9 +1,10 @@
 const Const = {
     POST: 'POST',
     GET: 'GET',
-    // Exchange
+    // MATCHBOOK
     EXCHANGE_TYPE_BACK: "back",
     EXCHANGE_TYPE_LAY: "lay",
+    EVENT_OPEN: "open",
     // Env
     DEV: "dev",
     PROD: "prod",

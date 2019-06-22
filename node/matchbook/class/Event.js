@@ -1,3 +1,5 @@
+const Const = require('../Const.js').Const;
+
 function Event() {
     this.id = null;
     this.name = null;
@@ -40,42 +42,46 @@ function Event() {
     this.update = function (event, time, callback) {
         const $this = this;
         $this.status = event.status;
-        event.markets.map(function (market) {
-            const $thisMarket = $this.markets.find(x => x.id === market.id);
-            if (typeof $thisMarket !== "undefined") {
-                //volume
-                $thisMarket.volume.push({
-                    [time]: market.volume,
-                });
-                //back-overround
-                $thisMarket['back-overround'].push({
-                    [time]: market['back-overround'],
-                });
-                //lay-overround
-                $thisMarket['lay-overround'].push({
-                    [time]: market['lay-overround'],
-                });
-                //runners
-                market.runners.map(function (runner) {
-                    const $thisRunner = $thisMarket.runners.find(x => x.id === runner.id);
-                    if (typeof $thisRunner !== "undefined") {
-                        //volume
-                        $thisRunner.volume.push({
-                            [time]: runner.volume,
-                        });
-                        $thisRunner.prices[time] = [];
-                        runner.prices.map(function (price) {
-                            $thisRunner.prices[time].push({
-                                'available-amount': price['available-amount'],
-                                odds: price.odds,
-                                side: price.side,
+        if ($this.status === Const.EVENT_OPEN) {
+            event.markets.map(function (market) {
+                const $thisMarket = $this.markets.find(x => x.id === market.id);
+                if (typeof $thisMarket !== "undefined") {
+                    //volume
+                    $thisMarket.volume.push({
+                        [time]: market.volume,
+                    });
+                    //back-overround
+                    $thisMarket['back-overround'].push({
+                        [time]: market['back-overround'],
+                    });
+                    //lay-overround
+                    $thisMarket['lay-overround'].push({
+                        [time]: market['lay-overround'],
+                    });
+                    //runners
+                    market.runners.map(function (runner) {
+                        const $thisRunner = $thisMarket.runners.find(x => x.id === runner.id);
+                        if (typeof $thisRunner !== "undefined") {
+                            //volume
+                            $thisRunner.volume.push({
+                                [time]: runner.volume,
                             });
-                        });
-                    }
-                });
-            }
-        });
-        callback(true);
+                            $thisRunner.prices[time] = [];
+                            runner.prices.map(function (price) {
+                                $thisRunner.prices[time].push({
+                                    'available-amount': price['available-amount'],
+                                    odds: price.odds,
+                                    side: price.side,
+                                });
+                            });
+                        }
+                    });
+                }
+            });
+            callback(true);
+        } else {
+            //TODO save in database and return something to say to Importer remove me from eventsToImport
+        }
     };
 }
 
