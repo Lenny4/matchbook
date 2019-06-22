@@ -7,6 +7,8 @@ const Env = require('./Env.js').Env;
 const Const = require('./Const.js').Const;
 const dev = require('./function/dev.js');
 const importer = require('./function/importer.js');
+//console.log(util.inspect(myObject, false, null, true))
+const util = require('util');
 
 const socketServer = Env.NODE_URL;
 

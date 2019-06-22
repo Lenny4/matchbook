@@ -6,7 +6,8 @@ const Env = {
 
     SYMFONY_URL: "//matchbook:80/",
     APP_ENV: "dev",
-    DEV_SESSION_TOKEN: "147329_5aed89da571e5ebc18767e7bd5c524",
+    DEV_SESSION_TOKEN: "147329_3004c2885d6599877a40a78e29618e",
+    AVAILABLE_COUNTRY: "Finland",
 
     AUTO_IMPORT_CONFIF: [
         //updateTime min value 1 /!\ Matchbook API recommend not exceed 60 call per minute

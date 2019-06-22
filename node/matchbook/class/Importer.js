@@ -1,4 +1,6 @@
 const Env = require('../Env.js').Env;
+const Event = require('./Event.js').Event;
+const util = require('util');
 
 function Importer(matchbookApi) {
     this.eventsToImport = [];
@@ -20,8 +22,19 @@ function Importer(matchbookApi) {
         const $this = this;
         $this.matchbookApi.getEventsId(eventIds, function (events) {
             console.log("Adding events to the importer ...");
-            //TODO foreach events as event instancier l'objet Event.js avec comme constructeur l'event de events
-            console.log(events);
+            let nbAddedEvent = 0;
+            events.map(function (event, index) {
+                if (typeof $this.eventsToImport.find(x => x.id === event.id) === "undefined" && index === 0) {
+                    const newEvent = new Event();
+                    newEvent.init(event, function (result) {
+                        if (result === true) {
+                            $this.eventsToImport.push(newEvent);
+                            nbAddedEvent++;
+                        }
+                    });
+                }
+            });
+            console.log(nbAddedEvent + " events added to importer !");
         });
         callback(true);
     };
@@ -35,7 +48,9 @@ function Importer(matchbookApi) {
                 arrayToImport.push(x);
             }
         });
+        //TODO with arrayToImport update the good $this.eventsToImport (need to call API)
         // console.log(arrayToImport);
+        // console.log(util.inspect($this.eventsToImport, false, null, true));
         if (currentTime >= resetTime) {
             currentTime = 1;
         }
