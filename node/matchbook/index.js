@@ -25,6 +25,7 @@ function init() {
         country: "table.result-table span.country_name"
     }).then(({data, response}) => {
         if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && typeof data !== "undefined" && typeof data.country !== "undefined") {
+            //TODO add an array in ENV.js with available countries
             if (data.country === "Finland") {
                 console.log('Your are in Finland !');
                 if (Env.APP_ENV === Const.DEV || Env.APP_ENV === Const.PROD) {

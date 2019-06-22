@@ -1,23 +1,19 @@
+const Env = require('../Env.js').Env;
+
 function Importer(matchbookApi) {
     this.eventsToImport = [];
     this.matchbookApi = matchbookApi;
+    this.autoImportConfig = Env.AUTO_IMPORT_CONFIF;
+
     this.init = function () {
-        const autoImportConfig = [
-            //updateTime min value 1 /!\
-            {time: 0, updateTime: 1},//more than 0 minute update all 1 s
-            {time: 300, updateTime: 2},//more than 5 minutes update all 2 s
-            {time: 600, updateTime: 5},//more than 10 minutes update all 5 s
-            {time: 900, updateTime: 60},//more than 15 minutes update all 60 s
-            {time: 1800, updateTime: 300},//more than 30 minutes update all 300 s
-            {time: 3600, updateTime: 600},//more than 60 minutes update all 600 s
-        ];
-        const resetTime = Math.max.apply(Math, autoImportConfig.map(function (o) {
+        const $this = this;
+        const resetTime = Math.max.apply(Math, $this.autoImportConfig.map(function (o) {
             return o.updateTime;
         }));
-        const reImportTime = Math.min.apply(Math, autoImportConfig.map(function (o) {
+        const reImportTime = Math.min.apply(Math, $this.autoImportConfig.map(function (o) {
             return o.updateTime;
         }));
-        autoImportEvent(1, autoImportConfig, resetTime, reImportTime);
+        $this.autoImportEvent(1, $this.autoImportConfig, resetTime, reImportTime);
     };
 
     this.addImport = function (eventIds, callback) {
@@ -30,8 +26,9 @@ function Importer(matchbookApi) {
         callback(true);
     };
 
-    function autoImportEvent(currentTime, config, resetTime, reImportTime) {
-        currentTime += reImportTime;
+    this.autoImportEvent = function (currentTime, config, resetTime) {
+        const $this = this;
+        currentTime += 1;
         const arrayToImport = [];
         config.map(function (x) {
             if (currentTime % x.updateTime === 0) {
@@ -43,8 +40,8 @@ function Importer(matchbookApi) {
             currentTime = 1;
         }
         setTimeout(function () {
-            autoImportEvent(currentTime, config, resetTime, reImportTime);
-        }, reImportTime * 1000);
+            $this.autoImportEvent(currentTime, config, resetTime, 1);
+        }, 1000); //Matchbook API recommend not exceed 60 call per minute
     }
 }
 

@@ -9,20 +9,20 @@ function MatchbookApi(username, password, env) {
     this.connected = null;
     this.headers = {};
     if (env === Const.DEV) {
-        this.headers['user-agent'] = 'api-doc-test-client';
+        this.headers['user-agent'] = Const.API_TEST;
     }
     // urls
-    this.GetSessionUrl = 'https://api.matchbook.com/bpapi/rest/security/session';
-    this.LoginUrl = 'https://api.matchbook.com/bpapi/rest/security/session';
-    this.GetSportsUrl = 'https://api.matchbook.com/edge/rest/lookups/sports';
-    this.getEventsUrl = 'https://api.matchbook.com/edge/rest/events';
+    this.GetSessionUrl = Const.GET_SESSION_URL;
+    this.LoginUrl = Const.LOGIN_URL;
+    this.GetSportsUrl = Const.GET_SPORTS_URL;
+    this.getEventsUrl = Const.GET_EVENTS_URL;
 
     this.login = function (env, callback) {
         const $this = this;
         console.log('Logging to matchbook API ...');
         if (env === Const.PROD) { // prod
             const options = {
-                method: 'POST',
+                method: Const.POST,
                 url: $this.LoginUrl,
                 json: {
                     "username": $this.username,
@@ -49,7 +49,7 @@ function MatchbookApi(username, password, env) {
             });
         } else { // dev
             const options = {
-                method: 'GET',
+                method: Const.GET,
                 url: $this.GetSessionUrl,
                 headers: $this.headers,
             };
@@ -76,7 +76,7 @@ function MatchbookApi(username, password, env) {
         const $this = this;
         console.log('Generating new token for dev ...');
         const options = {
-            method: 'POST',
+            method: Const.POST,
             url: $this.LoginUrl,
             json: {
                 "username": $this.username,
@@ -103,7 +103,7 @@ function MatchbookApi(username, password, env) {
         const $this = this;
         console.log('Getting all sports ...');
         const options = {
-            method: 'GET',
+            method: Const.GET,
             url: $this.GetSportsUrl,
             qs: {
                 offset: '0',
@@ -134,7 +134,7 @@ function MatchbookApi(username, password, env) {
         const after = data.find(x => x.name === "after").value;
         const before = parseInt(after) + (3600 * 24 * 3);//3 days
         const options = {
-            method: 'GET',
+            method: Const.GET,
             url: $this.getEventsUrl,
             qs: {
                 offset: '0',
@@ -168,7 +168,7 @@ function MatchbookApi(username, password, env) {
         const perPage = data.length.toString();
         const ids = data.join();
         const options = {
-            method: 'GET',
+            method: Const.GET,
             url: $this.getEventsUrl,
             qs: {
                 offset: '0',
