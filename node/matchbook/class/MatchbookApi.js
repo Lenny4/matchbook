@@ -34,8 +34,8 @@ function MatchbookApi(username, password, env) {
                 if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
                     $this.connected = Date.now() + (3600 * 5);//now + 5 hours
                     $this.headers['session-token'] = body['session-token'];
-                    callback(true);
                     console.log('Logging to matchbook API OK !', response.statusCode, "token", body['session-token']);
+                    callback(true);
                 } else {//error
                     $this.connected = null;
                     delete $this.headers['session-token'];
@@ -86,8 +86,8 @@ function MatchbookApi(username, password, env) {
         };
         request(options, function (error, response, body) {
             if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
-                callback(body['session-token']);
                 console.log('Generating new token OK !', response.statusCode, "token", body['session-token']);
+                callback(body['session-token']);
             } else {//error
                 callback(false);
                 if (error) {
@@ -115,8 +115,8 @@ function MatchbookApi(username, password, env) {
         };
         request(options, function (error, response, body) {
             if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
-                callback(JSON.parse(body)['sports']);
                 console.log('Get Sports OK !', response.statusCode);
+                callback(JSON.parse(body)['sports']);
             } else {//error
                 callback(false);
                 if (error) {
@@ -130,7 +130,7 @@ function MatchbookApi(username, password, env) {
 
     this.getEventsView = function (data, callback) {
         const $this = this;
-        console.log('Getting Events for view ...', data);
+        console.log('Getting Events View ...', data);
         const after = data.find(x => x.name === "after").value;
         const before = parseInt(after) + (3600 * 24 * 3);//3 days
         const options = {
@@ -143,19 +143,52 @@ function MatchbookApi(username, password, env) {
                 before: before.toString(),
                 'sport-ids': data.find(x => x.name === "sport-ids").value,
                 'exchange-type': 'back-lay',
+                'include-prices': 'false',
             },
             headers: $this.headers,
         };
         request(options, function (error, response, body) {
             if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
+                console.log('Get Events View OK !', response.statusCode);
                 callback(JSON.parse(body));
-                console.log('Get Events OK !', response.statusCode);
             } else {//error
                 callback(false);
                 if (error) {
                     console.log(error);
                 } else {
-                    console.log('Get Events KO !', response.statusCode);
+                    console.log('Get Events View KO !', response.statusCode);
+                }
+            }
+        });
+    };
+
+    this.getEventsId = function (data, callback) {
+        const $this = this;
+        console.log('Getting Events by id ...');
+        const perPage = data.length.toString();
+        const ids = data.join();
+        const options = {
+            method: 'GET',
+            url: $this.getEventsUrl,
+            qs: {
+                offset: '0',
+                'per-page': perPage,
+                ids: ids,
+                'include-prices': 'true',
+                'price-depth': '5',
+            },
+            headers: $this.headers,
+        };
+        request(options, function (error, response, body) {
+            if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
+                console.log('Get Events Id OK !', response.statusCode);
+                callback(JSON.parse(body).events);
+            } else {//error
+                callback(false);
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Get Events Id KO !', response.statusCode);
                 }
             }
         });

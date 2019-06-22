@@ -35,6 +35,8 @@ function init() {
                             setTimeout(function () {
                                 init();
                             }, 30000);
+                        } else {
+                            importer.init();
                         }
                     });
                 } else {
@@ -73,7 +75,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('start_import', function (data, fn) {
-        importer.startImport(data, function (result) {
+        importer.addImport(data, function (result) {
             fn(result);
         });
     });

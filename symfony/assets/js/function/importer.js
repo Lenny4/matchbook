@@ -36,8 +36,12 @@ function displayEvents(events) {
 }
 
 function startImport(socket) {
-    const allEvents = {events: []};
-    socket.emit('start_import', allEvents, function (result) {
+    const eventsChecked = $("#display-events-import").find("input:checked");
+    const eventIds = [];
+    eventsChecked.map(function (index, event) {
+        eventIds.push($(event).attr("id"));
+    });
+    socket.emit('start_import', eventIds, function (result) {
         console.log(result);
     });
 }
