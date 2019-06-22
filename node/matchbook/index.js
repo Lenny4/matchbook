@@ -11,9 +11,11 @@ const Env = require('./Env.js').Env;
 const Const = require('./Const.js').Const;
 const SymfonyApi = require('./class/SymfonyApi.js').SymfonyApi;
 const MatchbookApi = require('./class/MatchbookApi.js').MatchbookApi;
+const Importer = require('./class/Importer.js').Importer;
 
 const symfonyApi = new SymfonyApi(Env.SYMFONY_URL);
 const matchbookApi = new MatchbookApi(Env.USERNAME, Env.PASSWORD, Env.APP_ENV);
+const importer = new Importer(matchbookApi);
 
 function init() {
     console.log('\033[2J');
@@ -65,7 +67,13 @@ io.on('connection', (socket) => {
     });
 
     socket.on('get_events', function (data, fn) {
-        matchbookApi.getEvents(data, function (result) {
+        matchbookApi.getEventsView(data, function (result) {
+            fn(result);
+        });
+    });
+
+    socket.on('start_import', function (data, fn) {
+        importer.startImport(data, function (result) {
             fn(result);
         });
     });

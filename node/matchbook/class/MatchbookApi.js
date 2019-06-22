@@ -128,9 +128,9 @@ function MatchbookApi(username, password, env) {
         });
     };
 
-    this.getEvents = function (data, callback) {
+    this.getEventsView = function (data, callback) {
         const $this = this;
-        console.log('Getting Events ...', data);
+        console.log('Getting Events for view ...', data);
         const after = data.find(x => x.name === "after").value;
         const before = parseInt(after) + (3600 * 24 * 3);//3 days
         const options = {
@@ -143,12 +143,6 @@ function MatchbookApi(username, password, env) {
                 before: before.toString(),
                 'sport-ids': data.find(x => x.name === "sport-ids").value,
                 'exchange-type': 'back-lay',
-                'odds-type': 'DECIMAL',
-                'include-prices': 'false',
-                'price-depth': '5',
-                'price-mode': 'expanded',
-                'minimum-liquidity': '10',
-                'include-event-participants': 'false'
             },
             headers: $this.headers,
         };

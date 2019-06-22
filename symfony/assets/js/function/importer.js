@@ -1,4 +1,5 @@
 const Const = require('../Const.js').Const;
+const DateFunction = require('./date.js');
 
 function addAllSportsToSelectDom() {
     Const.ALL_SPORTS.map(function (element) {
@@ -6,7 +7,7 @@ function addAllSportsToSelectDom() {
         if (element.id === 24735152712200) {
             selected = "selected";
         }
-        $("select[sport-select]").append("<option " + selected + " name='sport' value='" + element.id + "'>" + element.id + " : " + element.name + "</option>")
+        $("select[sport-select]").append("<option " + selected + " name='sport' value='" + element.id + "'>" + element.name + " : " + element.id + "</option>")
     });
 }
 
@@ -15,11 +16,35 @@ function manageAfterValue() {
 }
 
 function displayEvents(events) {
-    console.log(events);
+    events = events.filter(x => x['allow-live-betting'] === true);
+    const div = $("#display-events-import");
+    const now = parseInt(new Date().getTime() / 1000);
+    $(div).html("");
+    events.map(function (event) {
+        const dateStart = new Date(event.start);
+        const timestampStart = parseInt(dateStart.getTime() / 1000);
+        $(div).append(
+            "<div style='margin-bottom: 10px' class='col-3'>" +
+            "<div class='box-shadow' style='position: relative'>" +
+            "<p><strong>" + event.name + "</strong><br/><i style='margin-left: 5px'>" + DateFunction.getHumanTimeBetweenDiff(now, timestampStart) + "</i></p>" +
+            "<p><strong>" + parseInt(event.volume).toLocaleString() + "</strong></p>" +
+            "<div class='custom-control custom-checkbox'><input checked type='checkbox' class='custom-control-input' id='" + event.id + "'><label class='custom-control-label' for='" + event.id + "'></label></div>" +
+            "</div>" +
+            "</div>"
+        );
+    });
+}
+
+function startImport(socket) {
+    const allEvents = {events: []};
+    socket.emit('start_import', allEvents, function (result) {
+        console.log(result);
+    });
 }
 
 module.exports = {
     addAllSportsToSelectDom,
     manageAfterValue,
     displayEvents,
+    startImport,
 };

@@ -31,6 +31,10 @@ $(document).ready(function () {
         importer.manageAfterValue();
     });
 
+    $(document).on("click", "#start-import", function () {
+        importer.startImport(socket);
+    });
+
     $(document).on("submit", "form", function (e) {
         e.preventDefault();
         const form = $(this).serializeArray();

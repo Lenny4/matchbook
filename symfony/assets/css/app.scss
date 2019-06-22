@@ -1,1 +1,17 @@
 @import "~bootstrap/scss/bootstrap";
+
+.box-shadow {
+  box-shadow: 0 0 10px 0 rgba(0, 18, 46, 0.4);
+  border-radius: 5px;
+}
+
+#display-events-import {
+  margin-top: 20px;
+}
+
+.custom-control {
+  float: right;
+  bottom: 0;
+  position: absolute;
+  right: 0;
+}

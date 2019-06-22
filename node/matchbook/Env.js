@@ -6,7 +6,7 @@ const Env = {
 
     SYMFONY_URL: "//matchbook:80/",
     APP_ENV: "dev",
-    DEV_SESSION_TOKEN: "147329_1031572322f54da9460ef96c74a972d",
+    DEV_SESSION_TOKEN: "147329_5aed89da571e5ebc18767e7bd5c524",
 };
 
 module.exports = {
