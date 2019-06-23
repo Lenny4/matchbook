@@ -42,8 +42,16 @@ function startImport(socket) {
         eventIds.push($(event).attr("id"));
     });
     socket.emit('start_import', eventIds, function (result) {
-        console.log(result);
+        alert(result);
     });
+}
+
+function unselectAllImport() {
+    $("#display-events-import.row input.custom-control-input[type='checkbox']").prop("checked", false);
+}
+
+function selectAllImport() {
+    $("#display-events-import.row input.custom-control-input[type='checkbox']").prop("checked", true);
 }
 
 module.exports = {
@@ -51,4 +59,6 @@ module.exports = {
     manageAfterValue,
     displayEvents,
     startImport,
+    unselectAllImport,
+    selectAllImport,
 };

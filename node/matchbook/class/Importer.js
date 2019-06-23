@@ -16,7 +16,7 @@ function Importer(matchbookApi, symfonyApi) {
         const reImportTime = Math.min.apply(Math, $this.autoImportConfig.map(function (o) {
             return o.updateTime;
         }));
-        $this.autoImportEvent(1, $this.autoImportConfig, resetTime, reImportTime);
+        $this.autoImportEvent(0, $this.autoImportConfig, resetTime, reImportTime);
     };
 
     this.addImport = function (eventIds, callback) {
@@ -73,16 +73,23 @@ function Importer(matchbookApi, symfonyApi) {
             }
         });
         if (currentTime >= resetTime) {
-            currentTime = 1;
+            currentTime = 0;
         }
         setTimeout(function () {
             $this.autoImportEvent(currentTime, config, resetTime, 1);
-        }, 10000); //Matchbook API recommend not exceed 60 call per minute
+        }, 1000); //Matchbook API recommend not exceed 60 call per minute
     };
 
     this.saveEvent = function (event) {
         const $this = this;
         console.log("Start save event ... " + event.id);
+        //Sending event to symfonyApi
+        const cloneEvent = JSON.parse(JSON.stringify(event));
+        $this.symfonyApi.saveEvent(cloneEvent);
+        //delete event from eventsToImport
+        const index = $this.eventsToImport.findIndex(x => x.id === event.id);
+        $this.eventsToImport.splice(index, 1);
+        console.log("event " + cloneEvent.id + " deleted from eventsToImport");
     };
 
     this.getEventsToUpdate = function (arrayToImport, callback) {
@@ -90,7 +97,7 @@ function Importer(matchbookApi, symfonyApi) {
         const now = parseInt(new Date().getTime() / 1000);
         const events = $this.eventsToImport.filter(function (event) {
             const diff = event.start - now;
-            if (typeof arrayToImport.find(x => diff > x.from && diff < x.to) !== "undefined") {
+            if (typeof arrayToImport.find(x => diff >= x.from && diff < x.to) !== "undefined") {
                 return event;
             }
         });

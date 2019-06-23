@@ -25,7 +25,7 @@ class KernelRequestListener
             return;
         }
         //if user not login redirect to login
-        if ($this->session->get('username') == null OR $this->session->get('password') == null) {
+        if ($event->getRequest()->isMethod('GET') AND ($this->session->get('username') == null OR $this->session->get('password') == null)) {
             $event->setResponse(new RedirectResponse($this->router->generate('login')));
         }
     }

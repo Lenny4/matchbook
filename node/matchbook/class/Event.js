@@ -41,8 +41,7 @@ function Event() {
 
     this.update = function (event, time, callback) {
         const $this = this;
-        $this.status = event.status;
-        if ($this.status === Const.EVENT_OPEN) {
+        if ($this.start > parseInt(new Date().getTime() / 1000)) {
             event.markets.map(function (market) {
                 const $thisMarket = $this.markets.find(x => x.id === market.id);
                 if (typeof $thisMarket !== "undefined") {

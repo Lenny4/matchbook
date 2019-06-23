@@ -37,6 +37,14 @@ $(document).ready(function () {
         importer.startImport(socket);
     });
 
+    $(document).on("click", "#unselected-all-import", function () {
+        importer.unselectAllImport();
+    });
+
+    $(document).on("click", "#selected-all-import", function () {
+        importer.selectAllImport();
+    });
+
     $(document).on("submit", "form", function (e) {
         e.preventDefault();
         const form = $(this).serializeArray();

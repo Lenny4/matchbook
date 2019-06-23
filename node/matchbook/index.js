@@ -13,7 +13,7 @@ const SymfonyApi = require('./class/SymfonyApi.js').SymfonyApi;
 const MatchbookApi = require('./class/MatchbookApi.js').MatchbookApi;
 const Importer = require('./class/Importer.js').Importer;
 
-const symfonyApi = new SymfonyApi(Env.SYMFONY_BASE_URL);
+const symfonyApi = new SymfonyApi();
 const matchbookApi = new MatchbookApi(Env.USERNAME, Env.PASSWORD, Env.APP_ENV);
 const importer = new Importer(matchbookApi, symfonyApi);
 
