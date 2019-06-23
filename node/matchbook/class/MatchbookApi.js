@@ -39,12 +39,12 @@ function MatchbookApi(username, password, env) {
                 } else {//error
                     $this.connected = null;
                     delete $this.headers['session-token'];
-                    callback(false);
                     if (error) {
                         console.log(error);
                     } else {
                         console.log('Logging to matchbook API KO !', response.statusCode);
                     }
+                    callback(false);
                 }
             });
         } else { // dev

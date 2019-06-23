@@ -4,19 +4,20 @@ const Env = {
     USERNAME: "matchibc45",
     PASSWORD: "Computer210496,",
 
-    SYMFONY_URL: "//matchbook:80/",
+    SYMFONY_BASE_URL: "//matchbook:80/",
     APP_ENV: "dev",
-    DEV_SESSION_TOKEN: "147329_3004c2885d6599877a40a78e29618e",
+    DEV_SESSION_TOKEN: "147329_ea9828135050f98af1bfaf6a42bdcd7",
     AVAILABLE_COUNTRY: "Finland",
 
     AUTO_IMPORT_CONFIF: [
         //updateTime min value 1 /!\ Matchbook API recommend not exceed 60 call per minute
-        {time: 0, updateTime: 1},//more than 0 minute update all 1 s
-        {time: 300, updateTime: 2},//more than 5 minutes update all 2 s
-        {time: 600, updateTime: 5},//more than 10 minutes update all 5 s
-        {time: 900, updateTime: 60},//more than 15 minutes update all 60 s
-        {time: 1800, updateTime: 300},//more than 30 minutes update all 300 s
-        {time: 3600, updateTime: 600},//more than 60 minutes update all 600 s
+        {from: -99999999999999, to: 300, updateTime: 1},//more than 0 minute update all 1 s
+        {from: 300, to: 600, updateTime: 2},//more than 5 minutes update all 2 s
+        {from: 600, to: 900, updateTime: 5},//more than 10 minutes update all 5 s
+        {from: 900, to: 1800, updateTime: 60},//more than 15 minutes update all 60 s
+        {from: 1800, to: 3600, updateTime: 300},//more than 30 minutes update all 300 s
+        {from: 3600, to: 99999999999999, updateTime: 600},//more than 60 minutes update all 600 s
+        {from: -99999999999999, to: 99999999999999, updateTime: 1},//for dev mode
     ],
 };
 

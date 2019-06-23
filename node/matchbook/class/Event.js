@@ -80,7 +80,7 @@ function Event() {
             });
             callback(true);
         } else {
-            //TODO save in database and return something to say to Importer remove me from eventsToImport
+            callback(false);
         }
     };
 }

@@ -1,5 +1,5 @@
-function SymfonyApi(url) {
-    this.url = url;
+function SymfonyApi(baseUrl) {
+    this.baseUrl = baseUrl;
 }
 
 module.exports = {

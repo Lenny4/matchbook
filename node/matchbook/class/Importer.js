@@ -2,9 +2,10 @@ const Env = require('../Env.js').Env;
 const Event = require('./Event.js').Event;
 const util = require('util');
 
-function Importer(matchbookApi) {
+function Importer(matchbookApi, symfonyApi) {
     this.eventsToImport = [];
     this.matchbookApi = matchbookApi;
+    this.symfonyApi = symfonyApi;
     this.autoImportConfig = Env.AUTO_IMPORT_CONFIF;
 
     this.init = function () {
@@ -24,7 +25,7 @@ function Importer(matchbookApi) {
             console.log("Adding events to the importer ...");
             let nbAddedEvent = 0;
             events.map(function (event, index) {
-                if (typeof $this.eventsToImport.find(x => x.id === event.id) === "undefined" && index === 0) {
+                if (typeof $this.eventsToImport.find(x => x.id === event.id) === "undefined") {
                     const newEvent = new Event();
                     newEvent.init(event, function (result) {
                         if (result === true) {
@@ -41,6 +42,7 @@ function Importer(matchbookApi) {
 
     this.autoImportEvent = function (currentTime, config, resetTime) {
         const $this = this;
+        const now = parseInt(new Date().getTime() / 1000);
         currentTime += 1;
         const arrayToImport = [];
         config.map(function (x) {
@@ -48,16 +50,52 @@ function Importer(matchbookApi) {
                 arrayToImport.push(x);
             }
         });
-        //TODO with arrayToImport update the good $this.eventsToImport (need to call API)
-        // console.log(arrayToImport);
-        // console.log(util.inspect($this.eventsToImport, false, null, true));
+        $this.getEventsToUpdate(arrayToImport, function (eventsToUpdate) {
+            if (eventsToUpdate.length > 0) {
+                const eventsToUpdateId = eventsToUpdate.map(x => x.id);
+                $this.matchbookApi.getEventsId(eventsToUpdateId, function (events) {
+                    let nbEventsSave = 0;
+                    events.map(function (event, index) {
+                        const eventToUpdate = eventsToUpdate.find(x => x.id === event.id);
+                        if (typeof eventToUpdate !== "undefined") {
+                            const time = now - eventToUpdate.start;
+                            eventToUpdate.update(event, time, function (result) {
+                                if (result === true) {
+                                    nbEventsSave++;
+                                } else {
+                                    $this.saveEvent(eventToUpdate);
+                                }
+                            });
+                        }
+                    });
+                    console.log(nbEventsSave + " events auto updated !");
+                });
+            }
+        });
         if (currentTime >= resetTime) {
             currentTime = 1;
         }
         setTimeout(function () {
             $this.autoImportEvent(currentTime, config, resetTime, 1);
-        }, 1000); //Matchbook API recommend not exceed 60 call per minute
-    }
+        }, 10000); //Matchbook API recommend not exceed 60 call per minute
+    };
+
+    this.saveEvent = function (event) {
+        const $this = this;
+        console.log("Start save event ... " + event.id);
+    };
+
+    this.getEventsToUpdate = function (arrayToImport, callback) {
+        const $this = this;
+        const now = parseInt(new Date().getTime() / 1000);
+        const events = $this.eventsToImport.filter(function (event) {
+            const diff = event.start - now;
+            if (typeof arrayToImport.find(x => diff > x.from && diff < x.to) !== "undefined") {
+                return event;
+            }
+        });
+        callback(events);
+    };
 }
 
 module.exports = {
