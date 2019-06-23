@@ -47,4 +47,28 @@ class ApiController extends AbstractController
             return $this->json($e);
         }
     }
+
+    /**
+     * @Route("/get-all-events", name="get_all_events")
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function getAllEvents()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $eventRepository = $em->getRepository("App\Entity\Event");
+        return $this->json($eventRepository->getAllEvents());
+    }
+
+    /**
+     * @Route("/get-event", name="get_event")
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function getEvent(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $id = $request->request->get('id');
+        $eventRepository = $em->getRepository("App\Entity\Event");
+        return $this->json($eventRepository->find($id));
+    }
 }

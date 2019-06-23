@@ -13,6 +13,13 @@ function getHumanTimeBetweenDiff(date1, date2) {
     return message;
 }
 
+function timestampToHuman(timestamp) {
+    const date = new Date(timestamp * 1000);
+    const options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+    return date.toLocaleDateString('fr-FR', options);
+}
+
 module.exports = {
     getHumanTimeBetweenDiff,
+    timestampToHuman,
 };

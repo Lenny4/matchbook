@@ -7,6 +7,7 @@ const Env = require('./Env.js').Env;
 const Const = require('./Const.js').Const;
 const dev = require('./function/dev.js');
 const importer = require('./function/importer.js');
+const backtest = require('./function/backtest.js');
 //console.log(util.inspect(myObject, false, null, true))
 const util = require('util');
 
@@ -43,6 +44,14 @@ $(document).ready(function () {
 
     $(document).on("click", "#selected-all-import", function () {
         importer.selectAllImport();
+    });
+
+    $(document).on("click", "#show-all-imported", function () {
+        backtest.showAllImported();
+    });
+
+    $(document).on("click", "[data-view-event-id]", function () {
+        backtest.showViewEvent($(this).data("view-event-id"), this);
     });
 
     $(document).on("submit", "form", function (e) {

@@ -1,1 +1,18 @@
-backtest
+<nav>
+    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <a class="nav-item nav-link active" id="nav-all-tab" data-toggle="tab" href="#nav-all" role="tab"
+           aria-controls="nav-all" aria-selected="true">All</a>
+        <a class="nav-item nav-link" id="nav-view-tab" data-toggle="tab" href="#nav-view" role="tab"
+           aria-controls="nav-view" aria-selected="false">View</a>
+        <a class="nav-item nav-link" id="nav-strategy-tab" data-toggle="tab" href="#nav-strategy" role="tab"
+           aria-controls="nav-strategy" aria-selected="false">Strategy</a>
+    </div>
+</nav>
+<div class="tab-content" id="nav-backtest">
+    <div class="tab-pane fade show active" id="nav-all" role="tabpanel"
+         aria-labelledby="nav-all-tab">{{ include('main/pages/backtest/all.html.twig') }}</div>
+    <div class="tab-pane fade" id="nav-view" role="tabpanel"
+         aria-labelledby="nav-view-tab">{{ include('main/pages/backtest/view.html.twig') }}</div>
+    <div class="tab-pane fade" id="nav-strategy" role="tabpanel"
+         aria-labelledby="nav-strategy-tab">{{ include('main/pages/backtest/strategy.html.twig') }}</div>
+</div>

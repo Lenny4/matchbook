@@ -18,4 +18,16 @@ class EventRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Event::class);
     }
+
+    /**
+     * @return mixed[]
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    public function getAllEvents()
+    {
+        $dbh = $this->getEntityManager()->getConnection();
+        $sql = "SELECT `id`, `name`, `event_id`, `sport_id`, `start` FROM `event`";
+        $stmt = $dbh->query($sql);
+        return $stmt->fetchAll();
+    }
 }

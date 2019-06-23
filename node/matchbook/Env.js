@@ -4,7 +4,7 @@ const Env = {
     USERNAME: "matchibc45",
     PASSWORD: "Computer210496,",
 
-    SYMFONY_BASE_URL: "http://matchbook:80/",
+    SYMFONY_BASE_URL: "http://matchbook:80/api/",
     APP_ENV: "dev",
     DEV_SESSION_TOKEN: "147329_ea9828135050f98af1bfaf6a42bdcd7",
     AVAILABLE_COUNTRY: "Finland",
