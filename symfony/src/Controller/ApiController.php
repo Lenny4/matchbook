@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Event;
+use App\Entity\EventJson;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -24,9 +25,11 @@ class ApiController extends AbstractController
      * @Route("/save-event", name="save_event")
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @throws \Exception
      */
     public function saveEvent(Request $request)
     {
+        ini_set('memory_limit', '-1');
         try {
             $em = $this->getDoctrine()->getManager();
             $eventId = $request->request->get('id');
@@ -35,16 +38,18 @@ class ApiController extends AbstractController
             $sportId = $request->request->get('sport-id');
             $event = $request->request->get('event');
             $eventEntity = new Event();
+            $eventJsonEntity = new EventJson();
             $eventEntity->setName($name);
             $eventEntity->setStart($start);
             $eventEntity->setEventId($eventId);
             $eventEntity->setSportId($sportId);
-            $eventEntity->setEvent(json_encode($event));
+            $eventJsonEntity->setJson($event);
+            $eventEntity->setJson($eventJsonEntity);
             $em->persist($eventEntity);
             $em->flush();
             return $this->json(true);
         } catch (\Exception $e) {
-            return $this->json($e);
+            return $this->json($e->getMessage());
         }
     }
 
@@ -69,6 +74,13 @@ class ApiController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $id = $request->request->get('id');
         $eventRepository = $em->getRepository("App\Entity\Event");
-        return $this->json($eventRepository->find($id));
+        $event = $eventRepository->find($id);
+        if ($event instanceof Event) {
+            $eventJson = $event->getJson();
+            if ($eventJson instanceof EventJson) {
+                return $this->json($eventJson->getJson());
+            }
+        }
+        return $this->json(false);
     }
 }

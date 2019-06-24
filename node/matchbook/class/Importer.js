@@ -54,21 +54,23 @@ function Importer(matchbookApi, symfonyApi) {
             if (eventsToUpdate.length > 0) {
                 const eventsToUpdateId = eventsToUpdate.map(x => x.id);
                 $this.matchbookApi.getEventsId(eventsToUpdateId, function (events) {
-                    let nbEventsSave = 0;
-                    events.map(function (event, index) {
-                        const eventToUpdate = eventsToUpdate.find(x => x.id === event.id);
-                        if (typeof eventToUpdate !== "undefined") {
-                            const time = now - eventToUpdate.start;
-                            eventToUpdate.update(event, time, function (result) {
-                                if (result === true) {
-                                    nbEventsSave++;
-                                } else {
-                                    $this.saveEvent(eventToUpdate);
-                                }
-                            });
-                        }
-                    });
-                    console.log(nbEventsSave + " events auto updated !");
+                    if (Array.isArray(events)) {
+                        let nbEventsSave = 0;
+                        events.map(function (event, index) {
+                            const eventToUpdate = eventsToUpdate.find(x => x.id === event.id);
+                            if (typeof eventToUpdate !== "undefined") {
+                                const time = now - eventToUpdate.start;
+                                eventToUpdate.update(event, time, function (result) {
+                                    if (result === true) {
+                                        nbEventsSave++;
+                                    } else {
+                                        $this.saveEvent(eventToUpdate);
+                                    }
+                                });
+                            }
+                        });
+                        console.log(nbEventsSave + " events auto updated !");
+                    }
                 });
             }
         });

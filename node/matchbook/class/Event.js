@@ -39,7 +39,7 @@ function Event() {
         });
     };
 
-    this.update = function (event, time, callback) {
+    this.update = function (event, time, callback, forceFalse = false) {
         const $this = this;
         if ($this.start > parseInt(new Date().getTime() / 1000)) {
             event.markets.map(function (market) {
@@ -65,9 +65,10 @@ function Event() {
                             $thisRunner.volume.push({
                                 [time]: runner.volume,
                             });
-                            $thisRunner.prices[time] = [];
+                            //TODO change structure view img
                             runner.prices.map(function (price) {
-                                $thisRunner.prices[time].push({
+                                $thisRunner.prices.push({
+                                    time: time,
                                     'available-amount': price['available-amount'],
                                     odds: price.odds,
                                     side: price.side,
@@ -77,7 +78,12 @@ function Event() {
                     });
                 }
             });
-            callback(true);
+            if (forceFalse) {
+                console.log("Force false update event to save in bdd !")
+                callback(false);
+            } else {
+                callback(true);
+            }
         } else {
             callback(false);
         }

@@ -37,9 +37,9 @@ class Event
     private $start;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\OneToOne(targetEntity="EventJson", cascade={"persist"})
      */
-    private $event;
+    private $json;
 
     public function getId(): ?int
     {
@@ -94,15 +94,19 @@ class Event
         return $this;
     }
 
-    public function getEvent(): ?string
+    /**
+     * @return mixed
+     */
+    public function getJson()
     {
-        return $this->event;
+        return $this->json;
     }
 
-    public function setEvent(string $event): self
+    /**
+     * @param mixed $json
+     */
+    public function setJson($json): void
     {
-        $this->event = $event;
-
-        return $this;
+        $this->json = $json;
     }
 }

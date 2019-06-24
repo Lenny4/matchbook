@@ -25,6 +25,11 @@
 {% block javascripts %}
     <script src="{{ asset('build/runtime.js') }}"></script>
     <script src="{{ asset('build/vendors~app.js') }}"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+    </script>
     <script src="{{ asset('build/app.js') }}"></script>
 {% endblock %}
 </body>
