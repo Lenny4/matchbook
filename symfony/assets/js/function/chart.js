@@ -184,7 +184,6 @@ function drawRunner(marketDiv, marketId, datas) {
     // drawRunnerVolume(marketDiv, marketId, datas.volume, datas.name);
     drawRunnerPrices(marketDiv, marketId, datas.prices, datas.name, "odds", true);
     drawRunnerPrices(marketDiv, marketId, datas.prices, datas.name, "available-amount", true);
-    // drawRunnerPrices(marketDiv, marketId, datas.prices, datas.name, "available-amount-percent", true);
 }
 
 module.exports = {

@@ -175,7 +175,7 @@ function MatchbookApi(username, password, env) {
                 'per-page': perPage,
                 ids: ids,
                 'include-prices': 'true',
-                'price-depth': '2',
+                'price-depth': '1',
             },
             headers: $this.headers,
         };
