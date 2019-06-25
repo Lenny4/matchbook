@@ -97,18 +97,46 @@ function drawRunnerPrices(marketDiv, marketId, datas, name, type, minLine = fals
         const time = Object.keys(price)[0];
         const details = price[time];
         const finalArray = [time];
-        details.map(function (detail, index) {
-            //if you have problem with back and lay graph try to ORDER BY detail with side ASC
-            if ((detail.side === "back" && indexBack.includes(index)) || (detail.side === "lay" && indexLay.includes(index))) {
-                finalArray.push(detail[type]);//odds or available-amount
+        if (minLine) {
+            if (details.filter(x => x.side === "back").length > 0) {
+                const maxBack = details.filter(x => x.side === "back").reduce(function (prev, current) {
+                    return (prev.odd > current.odd) ? prev : current
+                });
+                if (typeof maxBack !== "undefined") {
+                    finalArray.push(maxBack[type]);
+                } else {
+                    finalArray.push(0);
+                }
             } else {
                 finalArray.push(0);
             }
-        });
-        if (finalArray.length - 1 !== (indexBack.length + indexLay.length)) {
-            const nbZeroToAdd = Math.abs(finalArray.length - 1 - (indexBack.length + indexLay.length));
-            for (let i = 0; i < nbZeroToAdd; i++) {
+            if (details.filter(x => x.side === "lay").length > 0) {
+                const minLay = details.filter(x => x.side === "lay").reduce(function (prev, current) {
+                    return (prev.odd < current.odd) ? prev : current
+                });
+
+                if (typeof minLay !== "undefined") {
+                    finalArray.push(minLay[type]);
+                } else {
+                    finalArray.push(0);
+                }
+            } else {
                 finalArray.push(0);
+            }
+        } else {
+            details.map(function (detail, index) {
+                //if you have problem with back and lay graph try to ORDER BY detail with side ASC
+                if ((detail.side === "back" && indexBack.includes(index)) || (detail.side === "lay" && indexLay.includes(index))) {
+                    finalArray.push(detail[type]);//odds or available-amount
+                } else {
+                    finalArray.push(0);
+                }
+            });
+            if (finalArray.length - 1 !== (indexBack.length + indexLay.length)) {
+                const nbZeroToAdd = Math.abs(finalArray.length - 1 - (indexBack.length + indexLay.length));
+                for (let i = 0; i < nbZeroToAdd; i++) {
+                    finalArray.push(0);
+                }
             }
         }
         array.push(finalArray);
@@ -154,8 +182,9 @@ function drawRunnerVolume(marketDiv, marketId, datas, name) {
 
 function drawRunner(marketDiv, marketId, datas) {
     // drawRunnerVolume(marketDiv, marketId, datas.volume, datas.name);
-    drawRunnerPrices(marketDiv, marketId, datas.prices, datas.name, "odds", false);
-    drawRunnerPrices(marketDiv, marketId, datas.prices, datas.name, "available-amount", false);
+    drawRunnerPrices(marketDiv, marketId, datas.prices, datas.name, "odds", true);
+    drawRunnerPrices(marketDiv, marketId, datas.prices, datas.name, "available-amount", true);
+    // drawRunnerPrices(marketDiv, marketId, datas.prices, datas.name, "available-amount-percent", true);
 }
 
 module.exports = {
