@@ -2,9 +2,10 @@
 
 namespace App\Controller;
 
-use App\Entity\Account;
-use App\Form\AccountType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -20,19 +21,20 @@ class LoginController extends AbstractController
      */
     public function login(Request $request)
     {
-        $account = new Account();
-        $form = $this->createForm(AccountType::class, $account);
+        $form = $this->createFormBuilder()
+            ->add('username', TextType::class)
+            ->add('password', PasswordType::class)
+            ->add('login', SubmitType::class)
+            ->getForm();
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $accountRepo = $em->getRepository("App\Entity\Account");
-            if ($accountRepo->accountExist($account->getUsername(), $account->getPassword()) == 0) {
-                $em->persist($account);
-                $em->flush();
+            $data = $form->getData();
+            if ($data['username'] == $this->getParameter('username') AND $data['password'] == $this->getParameter('password')) {
+                $request->getSession()->set('username', $data['username']);
+                $request->getSession()->set('password', $data['password']);
             }
-            $request->getSession()->set('username', $account->getUsername());
-            $request->getSession()->set('password', $account->getPassword());
             return $this->redirectToRoute('main');
         }
 

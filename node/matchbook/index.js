@@ -15,8 +15,10 @@ const MatchbookApi = require('./matchbook-api/MatchbookApi.js').MatchbookApi;
 const env = new Env();
 const constante = new Const();
 const symfonyApi = new SymfonyApi(env.SYMFONY_URL);
+const matchbookApi = new MatchbookApi(constante.USERNAME, constante.PASSWORD);
 
-server.listen(port, () => {
+function init() {
+    console.log('\033[2J');
     console.log('Server listening at port %d', port);
     console.log('Verifying IP location ...');
     scrapeIt("https://iplocation.com/", {
@@ -25,29 +27,34 @@ server.listen(port, () => {
         if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && typeof data !== "undefined" && typeof data.country !== "undefined") {
             if (data.country === "Finland") {
                 console.log('Your are in Finland !');
+                matchbookApi.login(function (result) {
+                    if (result === false) {
+                        console.log("Error while starting server starting back in 30s");
+                        setTimeout(function () {
+                            init();
+                        }, 30000);
+                    }
+                });
             } else {
-                throw new Error('Your are not located in Finland');
+                console.log('Your are not located in Finland');
             }
         } else {
-            throw new Error('Error with iplocation.com');
+            console.log('Error with iplocation.com');
         }
     })
+}
+
+server.listen(port, () => {
+    init();
 });
 
 io.on('connection', (socket) => {
-
-    console.log('Logging to matchbook API ...');
-    const matchbookApi = new MatchbookApi();
-    socket.emit('login', {}, function (result) {
-    });
-    socket.on('login_back', function (data, fn) {
-        matchbookApi.username = data.username;
-        matchbookApi.password = data.password;
-        //TODO start login
-        fn(true);
-    });
+    // socket.emit('login', {}, function (result) {
+    // });
+    // socket.on('login_back', function (data, fn) {
+    // });
 });
 
 app.post('/get-strategies', function (req, res) {
-    // const symfonyApi = new SymfonyApi;
+
 });

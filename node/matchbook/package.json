@@ -8,6 +8,7 @@
   "license": "BSD",
   "dependencies": {
     "express": "^4.17.1",
+    "request": "^2.88.0",
     "scrape-it": "^5.1.4"
   },
   "scripts": {

@@ -16,9 +16,9 @@ $(document).ready(function () {
     });
 
     const socket = io(socketServer);
-    socket.on('login', function () {
-        socket.emit('login_back', account, function (result) {
-            console.log("login result", result);
-        });
-    });
+    // socket.on('login', function () {
+    //     socket.emit('login_back', account, function (result) {
+    //         console.log("login result", result);
+    //     });
+    // });
 });
