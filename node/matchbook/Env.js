@@ -6,7 +6,7 @@ const Env = {
 
     SYMFONY_BASE_URL: "http://matchbook:80/api/",
     APP_ENV: "dev",
-    DEV_SESSION_TOKEN: "147329_d58471e26b8bca86428d59d28a31ea",
+    DEV_SESSION_TOKEN: "147329_77ad71731290e74a223fd8944d95ec",
     AVAILABLE_COUNTRY: "Finland",
 
     AUTO_IMPORT_CONFIF: [

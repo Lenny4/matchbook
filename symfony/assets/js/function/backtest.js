@@ -45,8 +45,11 @@ function viewEvent(event) {
         const marketDiv = $("<div class='market' id='" + market.id + "'></div>").appendTo(viewDiv);
         $(marketDiv).append("<h1 style='clear: both;'>" + market.name + "</h1>");
         chart.drawVolumeMarket(marketDiv, market.id, market.volume);
-        chart.backLayGlobal(marketDiv, market.id, market["back-overround"], market["lay-overround"]);
-        $(viewDiv).append("<hr/>");
+        chart.drawBackLayGlobal(marketDiv, market.id, market["back-overround"], market["lay-overround"]);
+        market.runners.map(function (runner) {
+            chart.drawRunner(marketDiv, market.id, runner);
+        });
+        $(viewDiv).append("<hr/><hr/>");
     });
 }
 

@@ -20,10 +20,9 @@ function drawVolumeMarket(marketDiv, marketId, datas) {
     const chartDiv = $("<div class='chart' id='" + idChart + "'></div>").appendTo(marketDiv);
     const chart = new google.visualization.LineChart(document.getElementById(idChart));
     chart.draw(data, options);
-
 }
 
-function backLayGlobal(marketDiv, marketId, back, lay) {
+function drawBackLayGlobal(marketDiv, marketId, back, lay) {
     const array = [
         ['Time', 'Back/Lay']
     ];
@@ -54,10 +53,113 @@ function backLayGlobal(marketDiv, marketId, back, lay) {
     const chartDiv = $("<div class='chart' id='" + idChart + "'></div>").appendTo(marketDiv);
     const chart = new google.visualization.LineChart(document.getElementById(idChart));
     chart.draw(data, options);
+}
 
+function drawRunnerPrices(marketDiv, marketId, datas, name, type, minLine = false) {
+    let max = null;
+    let nbOddsBack = 0;
+    let nbOddsLay = 0;
+    const subArray = [];
+    const indexBack = [];
+    const indexLay = [];
+    if (minLine) {
+        nbOddsBack = 1;
+        nbOddsLay = 1;
+        subArray.push("Back");
+        subArray.push("Lay");
+        indexBack.push(0);
+        indexLay.push(0);
+    } else {
+        datas.find(function (o) {
+            const arrayPrice = o[Object.keys(o)[0]];
+            if (max === null) {
+                max = arrayPrice.slice();
+            } else if (arrayPrice.length > max.length) {
+                max = arrayPrice.slice();
+            }
+        });
+        max.map(function (price, index) {
+            if (price.side === "back") {
+                nbOddsBack++;
+                subArray.push("Back_" + nbOddsBack);
+                indexBack.push(index);
+            } else if (price.side === "lay") {
+                nbOddsLay++;
+                subArray.push("Lay_" + nbOddsLay);
+                indexLay.push(index);
+            }
+        });
+    }
+    const array = [
+        ['Time'].concat(subArray)
+    ];
+    datas.map(function (price) {
+        const time = Object.keys(price)[0];
+        const details = price[time];
+        const finalArray = [time];
+        details.map(function (detail, index) {
+            //if you have problem with back and lay graph try to ORDER BY detail with side ASC
+            if ((detail.side === "back" && indexBack.includes(index)) || (detail.side === "lay" && indexLay.includes(index))) {
+                finalArray.push(detail[type]);//odds or available-amount
+            } else {
+                finalArray.push(0);
+            }
+        });
+        if (finalArray.length - 1 !== (indexBack.length + indexLay.length)) {
+            const nbZeroToAdd = Math.abs(finalArray.length - 1 - (indexBack.length + indexLay.length));
+            for (let i = 0; i < nbZeroToAdd; i++) {
+                finalArray.push(0);
+            }
+        }
+        array.push(finalArray);
+    });
+    const data = google.visualization.arrayToDataTable(array);
+    const options = {
+        title: name + " prices " + type,
+        curveType: 'function',
+        legend: {position: 'bottom'},
+        width: 400,
+        height: 200,
+        chartArea: {left: 10, top: 20, width: "100%", height: "100%"},
+    };
+    const idChart = marketId + "_price_runner_" + name + type;
+    const chartDiv = $("<div class='chart' id='" + idChart + "'></div>").appendTo(marketDiv);
+    const chart = new google.visualization.LineChart(document.getElementById(idChart));
+    chart.draw(data, options);
+}
+
+function drawRunnerVolume(marketDiv, marketId, datas, name) {
+    const array = [
+        ['Time', 'Volume']
+    ];
+    datas.map(function (thisVolume) {
+        const time = Object.keys(thisVolume)[0];
+        const volume = parseInt(thisVolume[time]);
+        array.push([time, volume]);
+    });
+    const data = google.visualization.arrayToDataTable(array);
+    const options = {
+        title: name + " volume",
+        curveType: 'function',
+        legend: {position: 'bottom'},
+        width: 400,
+        height: 200,
+        chartArea: {left: 10, top: 20, width: "100%", height: "100%"},
+    };
+    const idChart = marketId + "_volume_runner_" + name;
+    const chartDiv = $("<div class='chart' id='" + idChart + "'></div>").appendTo(marketDiv);
+    const chart = new google.visualization.LineChart(document.getElementById(idChart));
+    chart.draw(data, options);
+}
+
+function drawRunner(marketDiv, marketId, datas) {
+    // drawRunnerVolume(marketDiv, marketId, datas.volume, datas.name);
+    drawRunnerPrices(marketDiv, marketId, datas.prices, datas.name, "odds", false);
+    drawRunnerPrices(marketDiv, marketId, datas.prices, datas.name, "available-amount", false);
 }
 
 module.exports = {
     drawVolumeMarket,
-    backLayGlobal,
+    drawBackLayGlobal,
+    drawRunner,
 };
