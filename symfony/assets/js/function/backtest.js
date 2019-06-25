@@ -42,13 +42,10 @@ function viewEvent(event) {
     const viewDiv = $(div).find(".view");
     $(viewDiv).html("");
     event.markets.map(function (market) {
-        $(viewDiv).append(
-            "<h1>" + market.name + "</h1>" +
-            "<div><div class='chart' id='" + market.id + "_market'></div><div class='chart' id='" + market.id + "_back_lay_global'></div></div>" +
-            "<hr style='clear: both'>"
-        );
-        chart.drawVolumeMarket(market.id + "_market", market.volume);
-        chart.backLayGlobal(market.id + "_back_lay_global", market["back-overround"], market["lay-overround"]);
+        const marketDiv = $("<div class='market' id='" + market.id + "'></div>").appendTo(viewDiv);
+        $(marketDiv).append("<h1 style='clear: both;'>" + market.name + "</h1>");
+        chart.drawVolumeMarket(marketDiv, market.id, market.volume);
+        chart.backLayGlobal(marketDiv, market.id, market["back-overround"], market["lay-overround"]);
     });
 }
 

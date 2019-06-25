@@ -1,4 +1,4 @@
-function drawVolumeMarket(divId, datas) {
+function drawVolumeMarket(marketDiv, marketId, datas) {
     const array = [
         ['Time', 'Volume']
     ];
@@ -16,12 +16,14 @@ function drawVolumeMarket(divId, datas) {
         height: 200,
         chartArea: {left: 10, top: 20, width: "100%", height: "100%"},
     };
-    const chart = new google.visualization.LineChart(document.getElementById(divId));
+    const idChart = marketId + "_market";
+    const chartDiv = $("<div class='chart' id='" + idChart + "'></div>").appendTo(marketDiv);
+    const chart = new google.visualization.LineChart(document.getElementById(idChart));
     chart.draw(data, options);
 
 }
 
-function backLayGlobal(divId, back, lay) {
+function backLayGlobal(marketDiv, marketId, back, lay) {
     const array = [
         ['Time', 'Back/Lay']
     ];
@@ -48,7 +50,9 @@ function backLayGlobal(divId, back, lay) {
         height: 200,
         chartArea: {left: 10, top: 20, width: "100%", height: "100%"},
     };
-    const chart = new google.visualization.LineChart(document.getElementById(divId));
+    const idChart = marketId + "_back_lay_global";
+    const chartDiv = $("<div class='chart' id='" + idChart + "'></div>").appendTo(marketDiv);
+    const chart = new google.visualization.LineChart(document.getElementById(idChart));
     chart.draw(data, options);
 
 }

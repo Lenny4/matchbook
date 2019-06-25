@@ -65,10 +65,13 @@ function Event() {
                             $thisRunner.volume.push({
                                 [time]: runner.volume,
                             });
-                            //TODO change structure view img
+                            //prices
+                            $thisRunner.prices.push({
+                                [time]: [],
+                            });
+                            const $thisPrice = $thisRunner.prices.find(x => Object.keys(x)[0] === time.toString());
                             runner.prices.map(function (price) {
-                                $thisRunner.prices.push({
-                                    time: time,
+                                $thisPrice[time].push({
                                     'available-amount': price['available-amount'],
                                     odds: price.odds,
                                     side: price.side,
