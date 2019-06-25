@@ -27,6 +27,7 @@ function init() {
         if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && typeof data !== "undefined" && typeof data.country !== "undefined") {
             if (data.country === "Finland") {
                 console.log('Your are in Finland !');
+                //TODO if APP_ENV === dev try to auto configure matchbookAPI, store session token in code and check with getSession if token is still active else get new one
                 matchbookApi.login(function (result) {
                     if (result === false) {
                         console.log("Error while starting server starting back in 30s");
