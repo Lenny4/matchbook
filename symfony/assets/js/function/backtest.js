@@ -46,6 +46,7 @@ function viewEvent(event) {
         $(marketDiv).append("<h1 style='clear: both;'>" + market.name + "</h1>");
         chart.drawVolumeMarket(marketDiv, market.id, market.volume);
         chart.backLayGlobal(marketDiv, market.id, market["back-overround"], market["lay-overround"]);
+        $(viewDiv).append("<hr/>");
     });
 }
 
