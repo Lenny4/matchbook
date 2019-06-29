@@ -4,6 +4,7 @@ const util = require('util');
 
 function SymfonyApi() {
     this.saveEventUrl = Const.SYMFONY_SAVE_EVENT;
+    this.getEventUrl = Const.SYMFONY_GET_EVENT;
 
     this.saveEvent = function (event) {
         const $this = this;
@@ -27,8 +28,7 @@ function SymfonyApi() {
                     }, 30000)
                 }
             }
-        )
-        ;
+        );
     };
 
     this.request = function (data, url, callback) {
@@ -39,6 +39,17 @@ function SymfonyApi() {
         }, function (err, httpResponse, body) {
             callback(err, httpResponse, body);
         });
+    };
+
+    this.getEvent = function (id, callback) {
+        const $this = this;
+        $this.request({
+                id: id,
+            }, $this.getEventUrl, function (err, httpResponse, body) {
+                const event = JSON.parse(JSON.parse(body));
+                callback(event);
+            }
+        );
     };
 }
 

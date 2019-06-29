@@ -16,6 +16,7 @@ function showAllImported() {
                 "<div style='margin-bottom: 10px' class='col-3'>" +
                 "<div class='box-shadow' style='position: relative'>" +
                 "<strong>" + event.name + "</strong><br/>" +
+                "<i>" + event.id + "</i><br/>" +
                 "<button data-view-event-id='" + event.id + "' class='btn btn-primary'>View</button>" +
                 "</div>" +
                 "</div>"

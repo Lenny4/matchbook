@@ -14,10 +14,12 @@ const Const = require('./Const.js').Const;
 const SymfonyApi = require('./class/SymfonyApi.js').SymfonyApi;
 const MatchbookApi = require('./class/MatchbookApi.js').MatchbookApi;
 const Importer = require('./class/Importer.js').Importer;
+const Backtest = require('./class/Backtest.js').Backtest;
 
 const symfonyApi = new SymfonyApi();
 const matchbookApi = new MatchbookApi(Env.USERNAME, Env.PASSWORD, Env.APP_ENV);
 const importer = new Importer(matchbookApi, symfonyApi);
+const backtest = new Backtest(symfonyApi);
 
 function init() {
     console.log('\033[2J');
@@ -39,6 +41,18 @@ function init() {
                             }, 30000);
                         } else {
                             importer.init();
+                            let percent = 0;
+                            const ids = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
+                            ids.map(function (id, index) {
+                                setTimeout(function () {
+                                    backtest.testDev(id, function (returnPercent) {
+                                        percent += returnPercent;
+                                        if (index === ids.length - 1) {
+                                            console.log(percent);
+                                        }
+                                    });
+                                }, 10000 * (id - 2))
+                            });
                         }
                     });
                 } else {
