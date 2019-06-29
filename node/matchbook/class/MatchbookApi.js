@@ -17,7 +17,7 @@ function MatchbookApi(username, password, env) {
     this.GetSportsUrl = Const.GET_SPORTS_URL;
     this.getEventsUrl = Const.GET_EVENTS_URL;
 
-    this.login = function (env, callback) {
+    this.login = function (env, callback = null) {
         const $this = this;
         console.log('Logging to matchbook API ...');
         if (env === Const.PROD) { // prod
@@ -47,6 +47,9 @@ function MatchbookApi(username, password, env) {
                     callback(false);
                 }
             });
+            setTimeout(function () {
+                $this.login(env);
+            }, (3600 * 5 * 1000));
         } else { // dev
             const options = {
                 method: Const.GET,
@@ -57,7 +60,7 @@ function MatchbookApi(username, password, env) {
                 if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
                     $this.connected = Date.now() + (3600 * 5);//now + 5 hours
                     console.log('Get Session to matchbook API OK !', response.statusCode);
-                    callback(true);
+                    if (callback !== null) callback(true);
                 } else {
                     $this.connected = null;
                     delete $this.headers['session-token'];
@@ -66,7 +69,7 @@ function MatchbookApi(username, password, env) {
                     } else {
                         console.log('Logging to matchbook API KO !', response.statusCode);
                     }
-                    callback(false);
+                    if (callback !== null) callback(false);
                 }
             });
         }

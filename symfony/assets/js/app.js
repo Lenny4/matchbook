@@ -8,6 +8,7 @@ const Const = require('./Const.js').Const;
 const dev = require('./function/dev.js');
 const importer = require('./function/importer.js');
 const backtest = require('./function/backtest.js');
+const liveBetting = require('./function/live-betting.js');
 //console.log(util.inspect(myObject, false, null, true))
 const util = require('util');
 
@@ -48,6 +49,10 @@ $(document).ready(function () {
 
     $(document).on("click", "#show-all-imported", function () {
         backtest.showAllImported();
+    });
+
+    $(document).on("click", "#start-live-betting", function () {
+        liveBetting.start(socket);
     });
 
     $(document).on("click", "[data-view-event-id]", function () {
