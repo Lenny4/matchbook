@@ -33,10 +33,11 @@ function Event() {
                 runners: runners,
             });
         });
-        const time = parseInt(new Date().getTime() / 1000) - $this.start;
-        $this.update(event, time, function (result) {
-            callback(result);
-        });
+        // const time = parseInt(new Date().getTime() / 1000) - $this.start;
+        //$this.update(event, time, function (result) {
+            //callback(result);
+        //});
+		callback(true);
     };
 
     this.update = function (event, time, callback, forceFalse = false) {

@@ -93,6 +93,8 @@ function drawRunnerPrices(marketDiv, marketId, datas, name, type, minLine = fals
     const array = [
         ['Time'].concat(subArray)
     ];
+    let lastBack = 0;
+    let lastLay = 0;
     datas.map(function (price) {
         const time = Object.keys(price)[0];
         const details = price[time];
@@ -104,11 +106,12 @@ function drawRunnerPrices(marketDiv, marketId, datas, name, type, minLine = fals
                 });
                 if (typeof maxBack !== "undefined") {
                     finalArray.push(maxBack[type]);
+                    lastBack = maxBack[type];
                 } else {
-                    finalArray.push(0);
+                    finalArray.push(lastBack);
                 }
             } else {
-                finalArray.push(0);
+                finalArray.push(lastBack);
             }
             if (details.filter(x => x.side === "lay").length > 0) {
                 const minLay = details.filter(x => x.side === "lay").reduce(function (prev, current) {
@@ -117,11 +120,12 @@ function drawRunnerPrices(marketDiv, marketId, datas, name, type, minLine = fals
 
                 if (typeof minLay !== "undefined") {
                     finalArray.push(minLay[type]);
+                    lastLay = minLay[type];
                 } else {
-                    finalArray.push(0);
+                    finalArray.push(lastLay);
                 }
             } else {
-                finalArray.push(0);
+                finalArray.push(lastLay);
             }
         } else {
             details.map(function (detail, index) {
@@ -139,7 +143,9 @@ function drawRunnerPrices(marketDiv, marketId, datas, name, type, minLine = fals
                 }
             }
         }
-        array.push(finalArray);
+        if (parseInt(time) > -7200) {//event start in less than 2 hours
+            array.push(finalArray);
+        }
     });
     const data = google.visualization.arrayToDataTable(array);
     const options = {
@@ -183,7 +189,7 @@ function drawRunnerVolume(marketDiv, marketId, datas, name) {
 function drawRunner(marketDiv, marketId, datas) {
     // drawRunnerVolume(marketDiv, marketId, datas.volume, datas.name);
     drawRunnerPrices(marketDiv, marketId, datas.prices, datas.name, "odds", true);
-    drawRunnerPrices(marketDiv, marketId, datas.prices, datas.name, "available-amount", true);
+    // drawRunnerPrices(marketDiv, marketId, datas.prices, datas.name, "available-amount", true);
 }
 
 module.exports = {

@@ -10,6 +10,7 @@ function showAllImported() {
     $(button).prop('disabled', true);
     $.post(url, function (events) {
         $(button).prop('disabled', false);
+        $(div).html("");
         events.map(function (event) {
             $(div).append(
                 "<div style='margin-bottom: 10px' class='col-3'>" +

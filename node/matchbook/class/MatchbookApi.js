@@ -56,17 +56,17 @@ function MatchbookApi(username, password, env) {
             request(options, function (error, response, body) {
                 if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
                     $this.connected = Date.now() + (3600 * 5);//now + 5 hours
-                    callback(true);
                     console.log('Get Session to matchbook API OK !', response.statusCode);
+                    callback(true);
                 } else {
                     $this.connected = null;
                     delete $this.headers['session-token'];
-                    callback(false);
                     if (error) {
                         console.log(error);
                     } else {
                         console.log('Logging to matchbook API KO !', response.statusCode);
                     }
+                    callback(false);
                 }
             });
         }
