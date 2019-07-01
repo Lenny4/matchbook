@@ -131,9 +131,9 @@ function MatchbookApi(username, password, env) {
         });
     };
 
-    this.getEventsView = function (data, callback) {
+    this.getEventsView = function (data, callback, noLog = false) {
         const $this = this;
-        console.log('Getting Events View ...', data);
+        if (!noLog) console.log('Getting Events View ...', data);
         const after = data.find(x => x.name === "after").value;
         const before = parseInt(after) + (3600 * 24 * 3);//3 days
         const options = {
@@ -152,22 +152,22 @@ function MatchbookApi(username, password, env) {
         };
         request(options, function (error, response, body) {
             if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
-                console.log('Get Events View OK !', response.statusCode);
+                if (!noLog) console.log('Get Events View OK !', response.statusCode);
                 callback(JSON.parse(body));
             } else {//error
                 callback(false);
                 if (error) {
                     console.log(error);
                 } else {
-                    console.log('Get Events View KO !', response.statusCode);
+                    if (!noLog) console.log('Get Events View KO !', response.statusCode);
                 }
             }
         });
     };
 
-    this.getEventsId = function (data, callback) {
+    this.getEventsId = function (data, callback, noLog = false) {
         const $this = this;
-        console.log('Getting Events by id ...');
+        if (!noLog) console.log('Getting Events by id ...');
         const perPage = data.length.toString();
         const ids = data.join();
         const options = {
@@ -184,14 +184,14 @@ function MatchbookApi(username, password, env) {
         };
         request(options, function (error, response, body) {
             if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
-                console.log('Get Events Id OK !', response.statusCode);
+                if (!noLog) console.log('Get Events Id OK !', response.statusCode);
                 callback(JSON.parse(body).events);
             } else {//error
                 callback(false);
                 if (error) {
                     console.log(error);
                 } else {
-                    console.log('Get Events Id KO !', response.statusCode);
+                    if (!noLog) console.log('Get Events Id KO !', response.statusCode);
                 }
             }
         });

@@ -4,7 +4,7 @@ const server = require('http').createServer(app);
 const io = require('../')(server);
 const port = process.env.PORT || 3000;
 const scrapeIt = require("scrape-it");
-//console.log(util.inspect(myObject, false, null, true))
+//console.log(util.inspect(myObject, false, null, true));
 const util = require('util');
 // app.use(express.urlencoded());
 // app.use(express.json());
