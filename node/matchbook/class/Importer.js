@@ -19,7 +19,7 @@ function Importer(matchbookApi, symfonyApi) {
         $this.autoImportEvent(0, $this.autoImportConfig, resetTime, reImportTime);
     };
 
-    this.addImport = function (eventIds, callback) {
+    this.addImport = function (eventIds, callback = null) {
         const $this = this;
         $this.matchbookApi.getEventsId(eventIds, function (events) {
             console.log("Adding events to the importer ...");
@@ -37,7 +37,7 @@ function Importer(matchbookApi, symfonyApi) {
             });
             console.log(nbAddedEvent + " events added to importer !");
         });
-        callback(true);
+        if (callback !== null) callback(true);
     };
 
     this.autoImportEvent = function (currentTime, config, resetTime) {

@@ -1,11 +1,11 @@
 const RSI = require('technicalindicators').RSI;
 
 function Backtest(symfonyApi) {
-    let lastValue = -1;
 
     this.testDev = function (id, callback) {
         const $this = this;
         let percent = 0;
+        let lastValue = -1;
         let lastBet = {
             type: null,
             odd: null,
@@ -115,7 +115,7 @@ function Backtest(symfonyApi) {
         } else {
             callback(false, false);
         }
-    }
+    };
 }
 
 module.exports = {

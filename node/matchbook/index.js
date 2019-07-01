@@ -20,7 +20,7 @@ const LiveBetting = require('./class/LiveBetting.js').LiveBetting;
 const symfonyApi = new SymfonyApi();
 const matchbookApi = new MatchbookApi(Env.USERNAME, Env.PASSWORD, Env.APP_ENV);
 const importer = new Importer(matchbookApi, symfonyApi);
-const liveBetting = new LiveBetting();
+const liveBetting = new LiveBetting(matchbookApi, symfonyApi);
 const backtest = new Backtest(symfonyApi);
 
 function init() {
