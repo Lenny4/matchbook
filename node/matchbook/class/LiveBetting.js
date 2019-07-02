@@ -22,7 +22,7 @@ function LiveBetting(matchbookApi, symfonyApi) {
 
     this.findEvents = function () {
         const $this = this;
-        console.log("Live Betting finding events ...");
+        // console.log("Live Betting finding events ...");
         const now = parseInt(new Date().getTime() / 1000);
         const data = [
             {name: "sport-ids", value: 24735152712200},
@@ -99,31 +99,33 @@ function LiveBetting(matchbookApi, symfonyApi) {
     this.addNewDatas = function (events) {
         const $this = this;
         const now = parseInt(new Date().getTime() / 1000);
-        events.map(function (event) {
-            const $thisEvent = $this.events.find(x => x.id === event.id);
-            const time = now - $thisEvent.start;
-            if (typeof $thisEvent !== "undefined") {
-                event.markets[0].runners.map(function (runner) {
-                    const $thisRunner = $thisEvent.runners.find(x => x.id === runner.id);
-                    if (typeof $thisRunner !== "undefined") {
-                        const back = runner.prices.find(x => x.side === "back");
-                        const lay = runner.prices.find(x => x.side === "lay");
-                        let newData = {
-                            time: time,
-                        };
-                        if (typeof lay !== "undefined") {
-                            newData.lay = lay.odds;
+        if (Array.isArray(events)) {
+            events.map(function (event) {
+                const $thisEvent = $this.events.find(x => x.id === event.id);
+                if (typeof $thisEvent !== "undefined") {
+                    const time = now - $thisEvent.start;
+                    event.markets[0].runners.map(function (runner) {
+                        const $thisRunner = $thisEvent.runners.find(x => x.id === runner.id);
+                        if (typeof $thisRunner !== "undefined") {
+                            const back = runner.prices.find(x => x.side === "back");
+                            const lay = runner.prices.find(x => x.side === "lay");
+                            let newData = {
+                                time: time,
+                            };
+                            if (typeof lay !== "undefined") {
+                                newData.lay = lay.odds;
+                            }
+                            if (typeof back !== "undefined") {
+                                newData.back = back.odds;
+                                $thisRunner.odds.push(newData);
+                            }
                         }
-                        if (typeof back !== "undefined") {
-                            newData.back = back.odds;
-                            $thisRunner.odds.push(newData);
-                        }
-                    }
-                });
-            } else {
-                console.log("error new created event not found 2");
-            }
-        });
+                    });
+                } else {
+                    console.log("error new created event not found 2");
+                }
+            });
+        }
         $this.bet(true);
     };
 
@@ -153,7 +155,7 @@ function LiveBetting(matchbookApi, symfonyApi) {
                         const layOdd = lastOdd.lay;
                         const time = lastOdd.time;
                         if (typeof time !== "undefined") {
-                            if ((backOdd < 12 || runner.bets.length % 2 !== 0) && (runner.lastValue !== -1) && (backOdd / layOdd >= 0.95) && (time > -1400)) {
+                            if ((runner.bets.length % 2 !== 0) || ((backOdd < 12) && (runner.lastValue !== -1) && (backOdd / layOdd >= 0.95) && (time > -1400))) {
                                 if (value < 20 && lastValue > 80) {
                                     //down => back
                                     $this.back(runner);
@@ -177,40 +179,48 @@ function LiveBetting(matchbookApi, symfonyApi) {
 
     this.back = function (runner, callback = null) {
         const $this = this;
-        if (runner.odds[runner.odds.length - 1].type === "lay") {
+        if (runner.bets.length % 2 === 0 || runner.bets[runner.bets.length - 1].type === "lay") {
             runner.bets.push({
                 type: "back",
                 odd: runner.odds[runner.odds.length - 1].back,
                 time: runner.odds[runner.odds.length - 1].time,
             });
             //TODO add function submit offer
+            if (callback !== null) callback();
+        } else {
+            if (callback !== null) callback();
         }
-        if (callback !== null) callback();
     };
 
     this.lay = function (runner, callback = null) {
         const $this = this;
-        if (runner.odds[runner.odds.length - 1].type === "back") {
+        if (runner.bets.length % 2 === 0 || runner.bets[runner.bets.length - 1].type === "back") {
             runner.bets.push({
                 type: "lay",
                 odd: runner.odds[runner.odds.length - 1].lay,
                 time: runner.odds[runner.odds.length - 1].time,
             });
             //TODO add function submit offer
+            if (callback !== null) callback();
+        } else {
+            if (callback !== null) callback();
         }
-        if (callback !== null) callback();
     };
 
     this.lastBet = function (runner, callback) {
         const $this = this;
-        if (runner.odds[runner.odds.length - 1].type === "lay") {
-            $this.back(runner, function () {
-                callback();
-            });
+        if (runner.bets.length % 2 !== 0) {
+            if (runner.bets[runner.bets.length - 1].type === "lay") {
+                $this.back(runner, function () {
+                    callback();
+                });
+            } else {
+                $this.lay(runner, function () {
+                    callback();
+                });
+            }
         } else {
-            $this.lay(runner, function () {
-                callback();
-            });
+            callback();
         }
     };
 
@@ -222,20 +232,16 @@ function LiveBetting(matchbookApi, symfonyApi) {
         console.log("=============================REMOVE=============================");
         console.log($this.events[index].name);
         $this.events[index].runners.map(function (runner) {
-            if (runner.bets.length % 2 !== 0) {
+            if (runner.bets.length > 0 && runner.bets.length % 2 !== 0) {
                 $this.lastBet(runner, function () {
-                    if (runner.bets.length > 0) {
-                        console.log(runner.name);
-                        console.log(runner.bets);
-                        console.log("==========================================================");
-                    }
-                });
-            } else {
-                if (runner.bets.length > 0) {
                     console.log(runner.name);
                     console.log(runner.bets);
-                    console.log("==========================================================");
-                }
+                    console.log("==========================================================", 1);
+                });
+            } else if (runner.bets.length > 0) {
+                console.log(runner.name);
+                console.log(runner.bets);
+                console.log("==========================================================", 2);
             }
         });
         $this.events.splice(index, 1);

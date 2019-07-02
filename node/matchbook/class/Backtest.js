@@ -2,7 +2,7 @@ const RSI = require('technicalindicators').RSI;
 
 function Backtest(symfonyApi) {
 
-    this.testDev = function (id, callback) {
+    this.testDevRsi = function (id, callback) {
         const $this = this;
         let percent = 0;
         let lastValue = -1;
@@ -95,6 +95,73 @@ function Backtest(symfonyApi) {
             console.log("===========================================================================");
             callback(percent);
         });
+    };
+
+    this.testDevSurbet = function (id) {
+        const $this = this;
+        const arraySurbet = [];
+        symfonyApi.getEvent(id, function (event) {
+            let oneDaySureBetBack = 0;
+            let oneDaySureBetLay = 0;
+            let alreadyOneDaySureBetBack = false;
+            let alreadyOneDaySureBetLay = false;
+            const runners = event.markets[0].runners;
+            runners.map(function (runner, index) {
+                runner.prices.map(function (price) {
+                    const time = Object.keys(price)[0];
+                    if (index === 0) {
+                        arraySurbet.push({
+                            time: time,
+                            eventName: event.name,
+                            oddsBack: [],
+                            surBetValueBack: null,
+                            oddsLay: [],
+                            surBetValueLay: null,
+                        });
+                    }
+                    const obj = arraySurbet.find(x => x.time === time);
+                    if (typeof obj !== "undefined") {
+                        const backOdd = price[time].find(x => x.side === "back");
+                        const LayOdd = price[time].find(x => x.side === "lay");
+                        if (typeof backOdd !== "undefined") {
+                            obj.oddsBack.push(backOdd.odds);
+                        }
+                        if (typeof LayOdd !== "undefined") {
+                            obj.oddsLay.push(LayOdd.odds);
+                        }
+                    }
+                });
+            });
+            arraySurbet.map(function (odds) {
+                let surBetValueBack = 0;
+                let surBetValueLay = 0;
+                odds.oddsBack.map(function (oddBack) {
+                    surBetValueBack += (1 / oddBack);
+                });
+                if (surBetValueBack < 1) {
+                    if (alreadyOneDaySureBetBack === false) {
+                        alreadyOneDaySureBetBack = true;
+                        oneDaySureBetBack += 1 - surBetValueBack;
+                        console.log(parseInt(oneDaySureBetBack * 100) / 100);
+                        console.log(odds.time, odds.eventName, odds.oddsBack, surBetValueBack, "back");
+                    }
+                }
+                odds.surBetValueBack = surBetValueBack;
+                odds.oddsLay.map(function (oddLay) {
+                    surBetValueLay += (1 / oddLay);
+                });
+                if (surBetValueLay > 1) {
+                    if (alreadyOneDaySureBetLay === false) {
+                        alreadyOneDaySureBetLay = true;
+                        oneDaySureBetLay += surBetValueLay - 1;
+                        console.log(parseInt(oneDaySureBetLay * 100) / 100);
+                        console.log(odds.time, odds.eventName, odds.oddsLay, parseInt(surBetValueLay * 100) / 100, "lay");
+                    }
+                }
+                odds.surBetValueLay = surBetValueLay;
+            });
+        });
+        console.log("=============");
     };
 
     this.findBiggerBackLowLay = function (price, callback) {
