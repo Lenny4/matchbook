@@ -177,7 +177,7 @@ function LiveBetting(matchbookApi, symfonyApi) {
         // console.log(util.inspect($this.events, false, null, true));
     };
 
-    this.back = function (runner, callback = null) {
+    this.back = function (runner, callback = null, last = false) {
         const $this = this;
         if (runner.bets.length % 2 === 0 || runner.bets[runner.bets.length - 1].type === "lay") {
             runner.bets.push({
@@ -185,6 +185,13 @@ function LiveBetting(matchbookApi, symfonyApi) {
                 odd: runner.odds[runner.odds.length - 1].back,
                 time: runner.odds[runner.odds.length - 1].time,
             });
+            if (runner.bets.length % 2 === 0 && !last) {
+                runner.bets.push({
+                    type: "back",
+                    odd: runner.odds[runner.odds.length - 1].back,
+                    time: runner.odds[runner.odds.length - 1].time,
+                });
+            }
             //TODO add function submit offer
             if (callback !== null) callback();
         } else {
@@ -192,7 +199,7 @@ function LiveBetting(matchbookApi, symfonyApi) {
         }
     };
 
-    this.lay = function (runner, callback = null) {
+    this.lay = function (runner, callback = null, last = false) {
         const $this = this;
         if (runner.bets.length % 2 === 0 || runner.bets[runner.bets.length - 1].type === "back") {
             runner.bets.push({
@@ -200,6 +207,13 @@ function LiveBetting(matchbookApi, symfonyApi) {
                 odd: runner.odds[runner.odds.length - 1].lay,
                 time: runner.odds[runner.odds.length - 1].time,
             });
+            if (runner.bets.length % 2 === 0 && !last) {
+                runner.bets.push({
+                    type: "lay",
+                    odd: runner.odds[runner.odds.length - 1].lay,
+                    time: runner.odds[runner.odds.length - 1].time,
+                });
+            }
             //TODO add function submit offer
             if (callback !== null) callback();
         } else {
@@ -213,11 +227,11 @@ function LiveBetting(matchbookApi, symfonyApi) {
             if (runner.bets[runner.bets.length - 1].type === "lay") {
                 $this.back(runner, function () {
                     callback();
-                });
+                }, true);
             } else {
                 $this.lay(runner, function () {
                     callback();
-                });
+                }, true);
             }
         } else {
             callback();
@@ -244,7 +258,38 @@ function LiveBetting(matchbookApi, symfonyApi) {
                 console.log("==========================================================", 2);
             }
         });
-        $this.events.splice(index, 1);
+        $this.calculateEsperance($this.events[index].runners, function () {
+            $this.events.splice(index, 1);
+        });
+    };
+
+    this.calculateEsperance = function (runners, callback) {
+        const $this = this;
+        let esperance = 0;
+        runners.map(function (runner) {
+            if (runner.bets.length > 0) {
+                let runnerEsperance = {
+                    sumBetsEsperance: 0,
+                    nbBetsEsperance: 0,
+                };
+                runner.bets.map(function (bet, index) {
+                    if (index % 2 === 0) {
+                        let backBet = runner.bets[index].odd;
+                        let layBet = runner.bets[index + 1].odd;
+                        if (runner.bets[index].type === "lay") {
+                            backBet = runner.bets[index + 1].odd;
+                            layBet = runner.bets[index].odd;
+                        }
+                        runnerEsperance.sumBetsEsperance += (backBet - layBet) * (1 / (backBet + layBet) / 2);
+                        runnerEsperance.nbBetsEsperance++;
+                    }
+                });
+                esperance += runnerEsperance.sumBetsEsperance / runnerEsperance.nbBetsEsperance;
+                console.log(runnerEsperance.sumBetsEsperance / runnerEsperance.nbBetsEsperance, runner.name);
+            }
+        });
+        console.log(esperance, "E(X)");
+        callback();
     };
 
     this.stop = function () {
