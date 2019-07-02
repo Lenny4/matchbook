@@ -153,7 +153,7 @@ function LiveBetting(matchbookApi, symfonyApi) {
                         const layOdd = lastOdd.lay;
                         const time = lastOdd.time;
                         if (typeof time !== "undefined") {
-                            if ((backOdd < 12) && (runner.lastValue !== -1) && (backOdd / layOdd >= 0.95) && (time > -1400)) {
+                            if ((backOdd < 12 || runner.bets.length % 2 !== 0) && (runner.lastValue !== -1) && (backOdd / layOdd >= 0.95) && (time > -1400)) {
                                 if (value < 20 && lastValue > 80) {
                                     //down => back
                                     $this.back(runner);
