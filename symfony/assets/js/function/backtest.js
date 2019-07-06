@@ -25,33 +25,34 @@ function showAllImported() {
     });
 }
 
-function showViewEvent(id, button) {
+function showViewEvent(id, button, socket) {
     const url = Env.SYMFONY_URL + Const.SYMFONY_URL_GET_EVENT;
     $(button).prop('disabled', true);
     $.post(url, {id: id}, function (event) {
         $(button).prop('disabled', false);
         $("#nav-view-tab").click();
-        viewEvent(JSON.parse(event));
+        viewEvent(JSON.parse(event), socket);
     });
 }
 
-function viewEvent(event) {
-    console.log(event);
+function viewEvent(event, socket) {
     const div = $("#nav-view");
     $(div).find(".h1").html(event.name);
     $(div).find(".h2").html(Const.ALL_SPORTS.find(x => x.id === parseInt(event["sport-id"])).name);
     $(div).find(".h3").html(date.timestampToHuman(event.start));
     const viewDiv = $(div).find(".view");
     $(viewDiv).html("");
-    event.markets.map(function (market) {
-        const marketDiv = $("<div class='market' id='" + market.id + "'></div>").appendTo(viewDiv);
-        $(marketDiv).append("<h1 style='clear: both;'>" + market.name + "</h1>");
-        chart.drawVolumeMarket(marketDiv, market.id, market.volume);
-        chart.drawBackLayGlobal(marketDiv, market.id, market["back-overround"], market["lay-overround"]);
-        market.runners.map(function (runner) {
-            chart.drawRunner(marketDiv, market.id, runner);
-        });
-        $(viewDiv).append("<hr/><hr/>");
+    event.markets.map(function (market, index) {
+        if (index === 0) {
+            const marketDiv = $("<div class='market' id='" + market.id + "'></div>").appendTo(viewDiv);
+            $(marketDiv).append("<h1 style='clear: both;'>" + market.name + "</h1>");
+            chart.drawVolumeMarket(marketDiv, market.id, market.volume);
+            chart.drawBackLayGlobal(marketDiv, market.id, market["back-overround"], market["lay-overround"]);
+            market.runners.map(function (runner) {
+                chart.drawRunner(marketDiv, market.id, runner, socket);
+            });
+            $(viewDiv).append("<hr/><hr/>");
+        }
     });
 }
 

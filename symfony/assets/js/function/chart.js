@@ -97,54 +97,56 @@ function drawRunnerPrices(marketDiv, marketId, datas, name, type, minLine = fals
     let lastLay = 0;
     datas.map(function (price) {
         const time = Object.keys(price)[0];
-        const details = price[time];
-        const finalArray = [time];
-        if (minLine) {
-            if (details.filter(x => x.side === "back").length > 0) {
-                const maxBack = details.filter(x => x.side === "back").reduce(function (prev, current) {
-                    return (prev.odd > current.odd) ? prev : current
-                });
-                if (typeof maxBack !== "undefined") {
-                    finalArray.push(maxBack[type]);
-                    lastBack = maxBack[type];
+        if (time > -600) {
+            const details = price[time];
+            const finalArray = [time];
+            if (minLine) {
+                if (details.filter(x => x.side === "back").length > 0) {
+                    const maxBack = details.filter(x => x.side === "back").reduce(function (prev, current) {
+                        return (prev.odd > current.odd) ? prev : current
+                    });
+                    if (typeof maxBack !== "undefined") {
+                        finalArray.push(maxBack[type]);
+                        lastBack = maxBack[type];
+                    } else {
+                        finalArray.push(lastBack);
+                    }
                 } else {
                     finalArray.push(lastBack);
                 }
+                // if (details.filter(x => x.side === "lay").length > 0) {
+                //     const minLay = details.filter(x => x.side === "lay").reduce(function (prev, current) {
+                //         return (prev.odd < current.odd) ? prev : current
+                //     });
+                //
+                //     if (typeof minLay !== "undefined") {
+                //         finalArray.push(minLay[type]);
+                //         lastLay = minLay[type];
+                //     } else {
+                //         finalArray.push(lastLay);
+                //     }
+                // } else {
+                //     finalArray.push(lastLay);
+                // }
             } else {
-                finalArray.push(lastBack);
-            }
-            // if (details.filter(x => x.side === "lay").length > 0) {
-            //     const minLay = details.filter(x => x.side === "lay").reduce(function (prev, current) {
-            //         return (prev.odd < current.odd) ? prev : current
-            //     });
-            //
-            //     if (typeof minLay !== "undefined") {
-            //         finalArray.push(minLay[type]);
-            //         lastLay = minLay[type];
-            //     } else {
-            //         finalArray.push(lastLay);
-            //     }
-            // } else {
-            //     finalArray.push(lastLay);
-            // }
-        } else {
-            details.map(function (detail, index) {
-                //if you have problem with back and lay graph try to ORDER BY detail with side ASC
-                if ((detail.side === "back" && indexBack.includes(index))) {
-                    finalArray.push(detail[type]);//odds or available-amount
-                } else {
-                    finalArray.push(0);
-                }
-            });
-            if (finalArray.length - 1 !== (indexBack.length + indexLay.length)) {
-                const nbZeroToAdd = Math.abs(finalArray.length - 1 - (indexBack.length + indexLay.length));
-                for (let i = 0; i < nbZeroToAdd; i++) {
-                    finalArray.push(0);
+                details.map(function (detail, index) {
+                    //if you have problem with back and lay graph try to ORDER BY detail with side ASC
+                    if ((detail.side === "back" && indexBack.includes(index))) {
+                        finalArray.push(detail[type]);//odds or available-amount
+                    } else {
+                        finalArray.push(0);
+                    }
+                });
+                if (finalArray.length - 1 !== (indexBack.length + indexLay.length)) {
+                    const nbZeroToAdd = Math.abs(finalArray.length - 1 - (indexBack.length + indexLay.length));
+                    for (let i = 0; i < nbZeroToAdd; i++) {
+                        finalArray.push(0);
+                    }
                 }
             }
-        }
-        if (parseInt(time) > -7200) {//event start in less than 2 hours
-            array.push(finalArray);
+            if (parseInt(time) > -7200) {//event start in less than 2 hours
+                array.push(finalArray);
+            }
         }
     });
     const data = google.visualization.arrayToDataTable(array);
@@ -160,6 +162,34 @@ function drawRunnerPrices(marketDiv, marketId, datas, name, type, minLine = fals
     const chartDiv = $("<div class='chart' id='" + idChart + "'></div>").appendTo(marketDiv);
     const chart = new google.visualization.LineChart(document.getElementById(idChart));
     chart.draw(data, options);
+}
+
+function drawMACD(marketDiv, marketId, datas, name, socket) {
+    const array = [
+        ['Time', 'macd - signal']
+    ];
+    socket.emit('chart_macd', datas, function (result) {
+        let time = -3600;
+        result.map(function (macdArray) {
+            if (typeof macdArray.MACD !== "undefined" && typeof macdArray.signal !== "undefined" && time > -600) {
+                array.push([time, macdArray.MACD - macdArray.signal]);
+            }
+            time += 1;
+        });
+        const data = google.visualization.arrayToDataTable(array);
+        const options = {
+            title: name + " macd",
+            curveType: 'function',
+            legend: {position: 'bottom'},
+            width: 400,
+            height: 200,
+            chartArea: {left: 10, top: 20, width: "100%", height: "100%"},
+        };
+        const idChart = marketId + "_macd_runner_" + name;
+        const chartDiv = $("<div class='chart' id='" + idChart + "'></div>").appendTo(marketDiv);
+        const chart = new google.visualization.LineChart(document.getElementById(idChart));
+        chart.draw(data, options);
+    });
 }
 
 function drawRunnerVolume(marketDiv, marketId, datas, name) {
@@ -186,9 +216,10 @@ function drawRunnerVolume(marketDiv, marketId, datas, name) {
     chart.draw(data, options);
 }
 
-function drawRunner(marketDiv, marketId, datas) {
+function drawRunner(marketDiv, marketId, datas, socket) {
     // drawRunnerVolume(marketDiv, marketId, datas.volume, datas.name);
     drawRunnerPrices(marketDiv, marketId, datas.prices, datas.name, "odds", true);
+    // drawMACD(marketDiv, marketId, datas.prices, datas.name, socket);
     // drawRunnerPrices(marketDiv, marketId, datas.prices, datas.name, "available-amount", true);
 }
 

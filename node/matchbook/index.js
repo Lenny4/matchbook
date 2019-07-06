@@ -102,6 +102,12 @@ io.on('connection', (socket) => {
         });
     });
 
+    socket.on('chart_macd', function (data, fn) {
+        backtest.chartMACD(data, function (result) {
+            fn(result);
+        });
+    });
+
     socket.on('get_events', function (data, fn) {
         matchbookApi.getEventsView(data, function (result) {
             fn(result);

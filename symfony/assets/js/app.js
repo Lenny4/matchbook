@@ -56,7 +56,7 @@ $(document).ready(function () {
     });
 
     $(document).on("click", "[data-view-event-id]", function () {
-        backtest.showViewEvent($(this).data("view-event-id"), this);
+        backtest.showViewEvent($(this).data("view-event-id"), this, socket);
     });
 
     $(document).on("submit", "form", function (e) {

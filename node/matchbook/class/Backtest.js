@@ -1,4 +1,6 @@
 const RSI = require('technicalindicators').RSI;
+const MACD = require('technicalindicators').MACD;
+const util = require('util');
 
 function Backtest(symfonyApi) {
 
@@ -183,6 +185,25 @@ function Backtest(symfonyApi) {
             callback(false, false);
         }
     };
+
+    this.chartMACD = function (prices, callback) {
+        const macdInput = {
+            values: [],
+            fastPeriod: 12,
+            slowPeriod: 26,
+            signalPeriod: 9,
+            SimpleMAOscillator: false,
+            SimpleMASignal: false,
+        };
+        prices.map(function (obj, index) {
+            const odd = obj[Object.keys(obj)[0]].find(x => x.side === "back");
+            if (typeof odd !== "undefined") {
+                macdInput.values.push(obj[Object.keys(obj)[0]].find(x => x.side === "back").odds);
+            }
+        });
+        const arrayToChart = MACD.calculate(macdInput);
+        callback(arrayToChart);
+    }
 }
 
 module.exports = {
