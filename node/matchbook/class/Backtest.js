@@ -166,6 +166,13 @@ function Backtest(symfonyApi) {
         console.log("=============");
     };
 
+    this.testStockfish = function (id) {
+        const $this = this;
+        symfonyApi.getEvent(id, function (event) {
+            console.log(event);
+        });
+    };
+
     this.findBiggerBackLowLay = function (price, callback) {
         const backPrices = price[Object.keys(price)[0]].filter(x => x.side === 'back');
         if (backPrices.length > 0) {
