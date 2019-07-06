@@ -35,6 +35,104 @@ function showViewEvent(id, button, socket) {
     });
 }
 
+function stockfish(runner) {
+    const nbOdds = 30;
+    const percentDiff = 0.04;
+    let lastBet = null;
+    runner.bets = [];
+    runner.prices.map(function (price, index) {
+        const time = Object.keys(price)[0];
+        if (time > -600) {
+            const back = price[time].find(x => x.side === "back");
+            const lay = price[time].find(x => x.side === "lay");
+            if (index >= nbOdds) {
+                let avg = {
+                    sum: 0,
+                    coeff: 0,
+                };
+                for (let i = index - 1; i > index - 1 - nbOdds; i--) {
+                    const thisTime = Object.keys(runner.prices[i])[0];
+                    const thisBack = runner.prices[i][thisTime].find(x => x.side === "back");
+                    avg.sum += thisBack.odds;
+                    avg.coeff += 1;
+                }
+                const thisAvg = avg.sum / avg.coeff;
+                const backThisAvgDiff = 1 - back.odds / thisAvg;
+                if (backThisAvgDiff > percentDiff) {
+                    if (lastBet !== "back") {
+                        runner.bets.push({
+                            time: time,
+                            type: "back",
+                            odd: lay.odds,
+                        });
+                        // console.log(time, thisAvg, back.odds, backThisAvgDiff, "back");
+                        // console.log("================");
+                        lastBet = "back";
+                    }
+                } else if (backThisAvgDiff < -percentDiff) {
+                    if (lastBet !== "lay") {
+                        runner.bets.push({
+                            time: time,
+                            type: "lay",
+                            odd: back.odds,
+                        });
+                        // console.log(time, thisAvg, back.odds, backThisAvgDiff, "lay");
+                        // console.log("================");
+                        lastBet = "lay";
+                    }
+                }
+                // console.log(time, thisAvg, back.odds, backThisAvgDiff);
+            }
+        }
+    });
+    if (runner.bets.length % 2 !== 0) {
+        const lastPrice = runner.prices[runner.prices.length - 1][Object.keys(runner.prices[runner.prices.length - 1])[0]];
+        if (runner.bets[runner.bets.length - 1].type === "lay") {
+            runner.bets.push({
+                time: 0,
+                type: "back",
+                odd: lastPrice.find(x => x.side === "back").odds,
+            });
+        } else {
+            runner.bets.push({
+                time: 0,
+                type: "lay",
+                odd: lastPrice.find(x => x.side === "lay").odds,
+            });
+        }
+    }
+    calculateEsperance([runner]);
+    console.log(runner.bets, runner.name);
+}
+
+function calculateEsperance(runners) {
+    const $this = this;
+    let esperance = 0;
+    runners.map(function (runner) {
+        if (runner.bets.length > 0) {
+            let runnerEsperance = {
+                sumBetsEsperance: 0,
+                nbBetsEsperance: 0,
+            };
+            runner.bets.map(function (bet, index) {
+                if (index % 2 === 0) {
+                    let backBet = runner.bets[index].odd;
+                    let layBet = runner.bets[index + 1].odd;
+                    if (runner.bets[index].type === "lay") {
+                        backBet = runner.bets[index + 1].odd;
+                        layBet = runner.bets[index].odd;
+                    }
+                    runnerEsperance.sumBetsEsperance += (backBet - layBet) * (1 / (backBet + layBet) / 2);
+                    runnerEsperance.nbBetsEsperance++;
+                }
+            });
+            esperance += runnerEsperance.sumBetsEsperance / runnerEsperance.nbBetsEsperance;
+            console.log(runnerEsperance.sumBetsEsperance / runnerEsperance.nbBetsEsperance, runner.name);
+        }
+    });
+    console.log(esperance, "E(X)");
+}
+
 function viewEvent(event, socket) {
     const div = $("#nav-view");
     $(div).find(".h1").html(event.name);
@@ -48,8 +146,11 @@ function viewEvent(event, socket) {
             $(marketDiv).append("<h1 style='clear: both;'>" + market.name + "</h1>");
             chart.drawVolumeMarket(marketDiv, market.id, market.volume);
             chart.drawBackLayGlobal(marketDiv, market.id, market["back-overround"], market["lay-overround"]);
-            market.runners.map(function (runner) {
+            market.runners.map(function (runner, index) {
+                // if (index === 1) {
+                stockfish(runner);
                 chart.drawRunner(marketDiv, market.id, runner, socket);
+                // }
             });
             $(viewDiv).append("<hr/><hr/>");
         }
