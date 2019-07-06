@@ -1,6 +1,7 @@
 const Env = require('../Env.js').Env;
 const util = require('util');
 const RSI = require('technicalindicators').RSI;
+const MACD = require('technicalindicators').MACD;
 
 function LiveBetting(matchbookApi, symfonyApi) {
     this.events = [];
@@ -62,7 +63,7 @@ function LiveBetting(matchbookApi, symfonyApi) {
                         return event;
                     }
                 });
-                // console.log("Adding " + eventsToBet.length + " new events", eventsToBet.map(x => x.name));
+                console.log("Adding " + eventsToBet.length + " new events", eventsToBet.map(x => x.name));
                 $this.autoBet(eventsToBet);
             } else {
                 // console.log("Adding 0 new event");
@@ -126,10 +127,11 @@ function LiveBetting(matchbookApi, symfonyApi) {
                 }
             });
         }
-        $this.bet(true);
+        // $this.betRSI(true);
+        $this.betMACD(true);
     };
 
-    this.bet = function (dev = false) {
+    this.betRSI = function (dev = false) {
         const $this = this;
         const now = parseInt(new Date().getTime() / 1000);
         $this.events.map(function (event, indexEvent) {
@@ -166,6 +168,58 @@ function LiveBetting(matchbookApi, symfonyApi) {
                             }
                         }
                         runner.lastValue = value;
+                    }
+                }
+                // }
+            });
+            if (now - start > -1) {
+                $this.remove(event.id);
+            }
+        });
+        // console.log(util.inspect($this.events, false, null, true));
+    };
+
+    this.betMACD = function (dev = false) {
+        const $this = this;
+        const now = parseInt(new Date().getTime() / 1000);
+        $this.events.map(function (event, indexEvent) {
+            const start = parseInt(new Date(event.start).getTime());
+            event.runners.map(function (runner, indexRunner) {
+                // if (indexRunner === 0 && indexEvent === 0 && dev) {
+                const macdInput = {
+                    values: [],
+                    fastPeriod: 12,
+                    slowPeriod: 26,
+                    signalPeriod: 9,
+                    SimpleMAOscillator: false,
+                    SimpleMASignal: false,
+                };
+                runner.odds.map(function (odds) {
+                    macdInput.values.push(odds.back);
+                });
+                const arrayToChart = MACD.calculate(macdInput);
+                if (arrayToChart.filter(x => typeof x.signal !== "undefined").length > 4) {
+                    const lastSignal = arrayToChart[arrayToChart.length - 1].signal;
+                    const lastMACD = arrayToChart[arrayToChart.length - 1].MACD;
+                    const secondLastSignal = arrayToChart[arrayToChart.length - 2].signal;
+                    const secondLastMACD = arrayToChart[arrayToChart.length - 2].MACD;
+                    const lastOdd = runner.odds[runner.odds.length - 1];
+                    const backOdd = lastOdd.back;
+                    const layOdd = lastOdd.lay;
+                    if ((runner.bets.length % 2 !== 0) || ((backOdd < 12) && (backOdd / layOdd >= 0.95))) {
+                        if (lastSignal < lastMACD && secondLastSignal > secondLastMACD) {
+                            $this.lay(runner, function () {
+                                // console.log(lastSignal, secondLastMACD, secondLastSignal, lastMACD);
+                                // console.log(util.inspect(runner.bets, false, null, true), runner.name);
+                                // console.log("===============");
+                            });
+                        } else if (lastSignal > lastMACD && secondLastSignal < secondLastMACD) {
+                            $this.back(runner, function () {
+                                // console.log(lastSignal, secondLastMACD, secondLastSignal, lastMACD);
+                                // console.log(util.inspect(runner.bets, false, null, true), runner.name);
+                                // console.log("===============");
+                            });
+                        }
                     }
                 }
                 // }
