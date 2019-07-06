@@ -66,7 +66,7 @@ function drawRunnerPrices(marketDiv, marketId, datas, name, type, minLine = fals
         nbOddsBack = 1;
         nbOddsLay = 1;
         subArray.push("Back");
-        subArray.push("Lay");
+        // subArray.push("Lay");
         indexBack.push(0);
         indexLay.push(0);
     } else {
@@ -85,8 +85,8 @@ function drawRunnerPrices(marketDiv, marketId, datas, name, type, minLine = fals
                 indexBack.push(index);
             } else if (price.side === "lay") {
                 nbOddsLay++;
-                subArray.push("Lay_" + nbOddsLay);
-                indexLay.push(index);
+                // subArray.push("Lay_" + nbOddsLay);
+                // indexLay.push(index);
             }
         });
     }
@@ -113,24 +113,24 @@ function drawRunnerPrices(marketDiv, marketId, datas, name, type, minLine = fals
             } else {
                 finalArray.push(lastBack);
             }
-            if (details.filter(x => x.side === "lay").length > 0) {
-                const minLay = details.filter(x => x.side === "lay").reduce(function (prev, current) {
-                    return (prev.odd < current.odd) ? prev : current
-                });
-
-                if (typeof minLay !== "undefined") {
-                    finalArray.push(minLay[type]);
-                    lastLay = minLay[type];
-                } else {
-                    finalArray.push(lastLay);
-                }
-            } else {
-                finalArray.push(lastLay);
-            }
+            // if (details.filter(x => x.side === "lay").length > 0) {
+            //     const minLay = details.filter(x => x.side === "lay").reduce(function (prev, current) {
+            //         return (prev.odd < current.odd) ? prev : current
+            //     });
+            //
+            //     if (typeof minLay !== "undefined") {
+            //         finalArray.push(minLay[type]);
+            //         lastLay = minLay[type];
+            //     } else {
+            //         finalArray.push(lastLay);
+            //     }
+            // } else {
+            //     finalArray.push(lastLay);
+            // }
         } else {
             details.map(function (detail, index) {
                 //if you have problem with back and lay graph try to ORDER BY detail with side ASC
-                if ((detail.side === "back" && indexBack.includes(index)) || (detail.side === "lay" && indexLay.includes(index))) {
+                if ((detail.side === "back" && indexBack.includes(index))) {
                     finalArray.push(detail[type]);//odds or available-amount
                 } else {
                     finalArray.push(0);
