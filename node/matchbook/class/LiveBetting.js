@@ -62,10 +62,10 @@ function LiveBetting(matchbookApi, symfonyApi) {
                         return event;
                     }
                 });
-                console.log("Adding " + eventsToBet.length + " new events", eventsToBet.map(x => x.name));
+                // console.log("Adding " + eventsToBet.length + " new events", eventsToBet.map(x => x.name));
                 $this.autoBet(eventsToBet);
             } else {
-                console.log("Adding 0 new event");
+                // console.log("Adding 0 new event");
             }
         }, true);
         setTimeout(function () {
@@ -158,10 +158,10 @@ function LiveBetting(matchbookApi, symfonyApi) {
                             if ((runner.bets.length % 2 !== 0) || ((backOdd < 12) && (runner.lastValue !== -1) && (backOdd / layOdd >= 0.95) && (time > -1400))) {
                                 if (value < 20 && lastValue > 80) {
                                     //down => back
-                                    $this.back(runner);
+                                    $this.lay(runner);
                                 } else if (value > 80 && lastValue < 20) {
                                     //up => lay
-                                    $this.lay(runner);
+                                    $this.back(runner);
                                 }
                             }
                         }
@@ -186,11 +186,11 @@ function LiveBetting(matchbookApi, symfonyApi) {
                 time: runner.odds[runner.odds.length - 1].time,
             });
             if (runner.bets.length % 2 === 0 && !last) {
-                runner.bets.push({
-                    type: "back",
-                    odd: runner.odds[runner.odds.length - 1].back,
-                    time: runner.odds[runner.odds.length - 1].time,
-                });
+                // runner.bets.push({
+                //     type: "back",
+                //     odd: runner.odds[runner.odds.length - 1].back,
+                //     time: runner.odds[runner.odds.length - 1].time,
+                // });
             }
             //TODO add function submit offer
             if (callback !== null) callback();
@@ -208,11 +208,11 @@ function LiveBetting(matchbookApi, symfonyApi) {
                 time: runner.odds[runner.odds.length - 1].time,
             });
             if (runner.bets.length % 2 === 0 && !last) {
-                runner.bets.push({
-                    type: "lay",
-                    odd: runner.odds[runner.odds.length - 1].lay,
-                    time: runner.odds[runner.odds.length - 1].time,
-                });
+                // runner.bets.push({
+                //     type: "lay",
+                //     odd: runner.odds[runner.odds.length - 1].lay,
+                //     time: runner.odds[runner.odds.length - 1].time,
+                // });
             }
             //TODO add function submit offer
             if (callback !== null) callback();
