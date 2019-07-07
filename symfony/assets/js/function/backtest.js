@@ -36,8 +36,8 @@ function showViewEvent(id, button, socket) {
 }
 
 function stockfish(runner) {
-    const nbOdds = 30;
-    const percentDiff = 0.04;
+    const nbOdds = 10;
+    const percentDiff = 0.02;
     let lastBet = null;
     runner.bets = [];
     runner.prices.map(function (price, index) {
@@ -58,27 +58,27 @@ function stockfish(runner) {
                 }
                 const thisAvg = avg.sum / avg.coeff;
                 const backThisAvgDiff = 1 - back.odds / thisAvg;
-                if (backThisAvgDiff > percentDiff) {
-                    if (lastBet !== "back") {
-                        runner.bets.push({
-                            time: time,
-                            type: "back",
-                            odd: lay.odds,
-                        });
-                        // console.log(time, thisAvg, back.odds, backThisAvgDiff, "back");
-                        // console.log("================");
-                        lastBet = "back";
-                    }
-                } else if (backThisAvgDiff < -percentDiff) {
+                if (backThisAvgDiff < -percentDiff) {
                     if (lastBet !== "lay") {
                         runner.bets.push({
                             time: time,
                             type: "lay",
+                            odd: lay.odds,
+                        });
+                        // console.log(time, thisAvg, back.odds, backThisAvgDiff, "back");
+                        // console.log("================");
+                        lastBet = "lay";
+                    }
+                } else if (backThisAvgDiff > percentDiff) {
+                    if (lastBet !== "back") {
+                        runner.bets.push({
+                            time: time,
+                            type: "back",
                             odd: back.odds,
                         });
                         // console.log(time, thisAvg, back.odds, backThisAvgDiff, "lay");
                         // console.log("================");
-                        lastBet = "lay";
+                        lastBet = "back";
                     }
                 }
                 // console.log(time, thisAvg, back.odds, backThisAvgDiff);
