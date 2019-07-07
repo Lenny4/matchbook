@@ -105,6 +105,81 @@ function stockfish(runner) {
     console.log(runner.bets, runner.name);
 }
 
+function stockfishv2(runner) {
+    const nbOdds = 10;
+    let lastBet = null;
+    runner.bets = [];
+    runner.prices.map(function (price, index) {
+        const time = Object.keys(price)[0];
+        if (time > -600) {
+            const back = price[time].find(x => x.side === "back");
+            const lay = price[time].find(x => x.side === "lay");
+            if (index >= nbOdds) {
+                let lastBack = null;
+                const lowHigh = {
+                    low: 0,
+                    high: 0,
+                    flat: 0,
+                };
+                for (let i = index - 1; i > index - 1 - nbOdds; i--) {
+                    const thisTime = Object.keys(runner.prices[i])[0];
+                    const thisBack = runner.prices[i][thisTime].find(x => x.side === "back");
+                    if (lastBack !== null) {
+                        if (thisBack.odds > lastBack) {
+                            lowHigh.low += 1;
+                        } else if (thisBack.odds < lastBack) {
+                            lowHigh.high += 1;
+                        } else {
+                            lowHigh.flat += 1;
+                        }
+                    }
+                    // console.log(time, goLowOrHigh, lastBack, back.odds, thisBack.odds);
+                    lastBack = thisBack.odds;
+                    moreGlobal += 1;
+                }
+                // console.log(time, lowHigh);
+                if (lastBet !== "lay" && (lowHigh.high > 2 && lowHigh.low === 0)) {
+                    runner.bets.push({
+                        time: time,
+                        type: "lay",
+                        odd: lay.odds,
+                    });
+                    // console.log(time, thisAvg, back.odds, backThisAvgDiff, "back");
+                    // console.log("================");
+                    lastBet = "lay";
+                } else if (lastBet !== "back" && (lowHigh.low > 2 && lowHigh.high === 0)) {
+                    runner.bets.push({
+                        time: time,
+                        type: "back",
+                        odd: back.odds,
+                    });
+                    // console.log(time, thisAvg, back.odds, backThisAvgDiff, "lay");
+                    // console.log("================");
+                    lastBet = "back";
+                }
+            }
+        }
+    });
+    if (runner.bets.length % 2 !== 0) {
+        const lastPrice = runner.prices[runner.prices.length - 1][Object.keys(runner.prices[runner.prices.length - 1])[0]];
+        if (runner.bets[runner.bets.length - 1].type === "lay") {
+            runner.bets.push({
+                time: 0,
+                type: "back",
+                odd: lastPrice.find(x => x.side === "back").odds,
+            });
+        } else {
+            runner.bets.push({
+                time: 0,
+                type: "lay",
+                odd: lastPrice.find(x => x.side === "lay").odds,
+            });
+        }
+    }
+    calculateEsperance([runner]);
+    console.log(runner.bets, runner.name);
+}
+
 function calculateEsperance(runners) {
     const $this = this;
     let esperance = 0;
@@ -147,8 +222,9 @@ function viewEvent(event, socket) {
             chart.drawVolumeMarket(marketDiv, market.id, market.volume);
             chart.drawBackLayGlobal(marketDiv, market.id, market["back-overround"], market["lay-overround"]);
             market.runners.map(function (runner, index) {
-                // if (index === 1) {
-                stockfish(runner);
+                // if (index === 0) {
+                // stockfish(runner);
+                stockfishv2(runner);
                 chart.drawRunner(marketDiv, market.id, runner, socket);
                 // }
             });
