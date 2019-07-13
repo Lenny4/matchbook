@@ -77,12 +77,12 @@ function init() {
                             // });
 
                             // EXPORT
-                            // const ids = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
-                            const ids = [3];
+                            const ids = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
+                            // const ids = [3];
                             ids.map(function (id, index) {
                                 setTimeout(function () {
                                     backtest.export(id);
-                                }, (5000 * (id - 2)) - 5000);
+                                }, (5000 * (id - ids[0] - 1)) - 5000);
                             });
                         }
                     });

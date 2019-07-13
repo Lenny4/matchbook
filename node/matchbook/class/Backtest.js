@@ -182,19 +182,19 @@ function Backtest(symfonyApi) {
             const allRunners = market.runners.map(function (runner) {
                 return {
                     name: runner.name,
-                    volume: null,
-                    backOdd: null,
-                    backAvailableAmount: null,
-                    layOdd: null,
-                    layAvailableAmount: null,
+                    volume: "",
+                    backOdd: "",
+                    backAvailableAmount: "",
+                    layOdd: "",
+                    layAvailableAmount: "",
                 };
             });
-            for (let i = -3599; i < -1; i++) {
+            for (let i = -3599; i < 0; i++) {
                 eventExport.push({
                     time: i,
-                    'back-overround': null,
-                    'lay-overround': null,
-                    volume: null,
+                    'back-overround': "",
+                    'lay-overround': "",
+                    volume: "",
                     runners: JSON.parse(JSON.stringify(allRunners)),
                 });
             }
@@ -202,15 +202,19 @@ function Backtest(symfonyApi) {
                 const key = Object.keys(back)[0];
                 const value = back[key];
                 const time = parseInt(key);
-                const arrayToUpdate = eventExport.find(x => x.time === time);
-                arrayToUpdate['back-overround'] = value;
+                if (Number.isInteger(time)) {
+                    const arrayToUpdate = eventExport.find(x => x.time === time);
+                    arrayToUpdate['back-overround'] = value;
+                }
             });
-            market['lay-overround'].map(function (back) {
-                const key = Object.keys(back)[0];
-                const value = back[key];
+            market['lay-overround'].map(function (lay) {
+                const key = Object.keys(lay)[0];
+                const value = lay[key];
                 const time = parseInt(key);
-                const arrayToUpdate = eventExport.find(x => x.time === time);
-                arrayToUpdate['lay-overround'] = value;
+                if (Number.isInteger(time)) {
+                    const arrayToUpdate = eventExport.find(x => x.time === time);
+                    arrayToUpdate['lay-overround'] = value;
+                }
             });
             market.volume.map(function (volume) {
                 const key = Object.keys(volume)[0];
@@ -247,11 +251,27 @@ function Backtest(symfonyApi) {
             const eventName = event.name.replace(":", "h");
             const stream = fs.createWriteStream("export/" + eventName + ".csv");
             stream.once('open', function (fd) {
-                stream.write("My first row\n");
-                stream.write("My second row\n");
+                stream.write("\"sep=;\"\n");
+                stream.write(";;;;");
+                eventExport[0].runners.map(function (runner) {
+                    stream.write(runner.name + ";;;;;");
+                });
+                stream.write("\n");
+                stream.write("time;back-overround;lay-overround;volume");
+                eventExport[0].runners.map(function (runner) {
+                    stream.write(";volumeRunner;backOdd;backAvailableAmount;layOdd;layAvailableAmount");
+                });
+                eventExport.map(function (line) {
+                    stream.write("\n");
+                    stream.write(line.time + ";" + line['back-overround'] + ";" + line['lay-overround'] + ";" + line.volume);
+                    line.runners.map(function (runner) {
+                        stream.write(";" + runner.volume + ";" + runner.backOdd + ";" + runner.backAvailableAmount + ";" + runner.layOdd + ";" + runner.layAvailableAmount);
+                    });
+                });
+                stream.write("\n");
                 stream.end();
             });
-            console.log(event.name, "done");
+            console.log(id, event.name, "done");
             // console.log(util.inspect(eventExport[1000], false, null, true));
             // console.log(util.inspect(eventExport[3000], false, null, true));
         });
