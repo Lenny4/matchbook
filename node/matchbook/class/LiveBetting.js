@@ -128,7 +128,7 @@ function LiveBetting(matchbookApi, symfonyApi) {
             });
         }
         // $this.betRSI(true);
-        $this.betMACD(true);
+        // $this.betMACD(true);
     };
 
     this.betRSI = function (dev = false) {
