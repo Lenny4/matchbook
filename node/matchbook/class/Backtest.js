@@ -1,6 +1,7 @@
 const RSI = require('technicalindicators').RSI;
 const MACD = require('technicalindicators').MACD;
 const util = require('util');
+const fs = require('fs');
 
 function Backtest(symfonyApi) {
 
@@ -170,6 +171,89 @@ function Backtest(symfonyApi) {
         const $this = this;
         symfonyApi.getEvent(id, function (event) {
             console.log(event);
+        });
+    };
+
+    this.export = function (id) {
+        const $this = this;
+        const eventExport = [];
+        symfonyApi.getEvent(id, function (event) {
+            const market = event.markets[0];
+            const allRunners = market.runners.map(function (runner) {
+                return {
+                    name: runner.name,
+                    volume: null,
+                    backOdd: null,
+                    backAvailableAmount: null,
+                    layOdd: null,
+                    layAvailableAmount: null,
+                };
+            });
+            for (let i = -3599; i < -1; i++) {
+                eventExport.push({
+                    time: i,
+                    'back-overround': null,
+                    'lay-overround': null,
+                    volume: null,
+                    runners: JSON.parse(JSON.stringify(allRunners)),
+                });
+            }
+            market['back-overround'].map(function (back) {
+                const key = Object.keys(back)[0];
+                const value = back[key];
+                const time = parseInt(key);
+                const arrayToUpdate = eventExport.find(x => x.time === time);
+                arrayToUpdate['back-overround'] = value;
+            });
+            market['lay-overround'].map(function (back) {
+                const key = Object.keys(back)[0];
+                const value = back[key];
+                const time = parseInt(key);
+                const arrayToUpdate = eventExport.find(x => x.time === time);
+                arrayToUpdate['lay-overround'] = value;
+            });
+            market.volume.map(function (volume) {
+                const key = Object.keys(volume)[0];
+                const value = volume[key];
+                const time = parseInt(key);
+                const arrayToUpdate = eventExport.find(x => x.time === time);
+                arrayToUpdate.volume = value;
+            });
+            market.runners.map(function (runner) {
+                runner.volume.map(function (volume) {
+                    const key = Object.keys(volume)[0];
+                    const value = volume[key];
+                    const time = parseInt(key);
+                    const runnerToUpdate = eventExport.find(x => x.time === time).runners.find(y => y.name === runner.name);
+                    runnerToUpdate.volume = value;
+                });
+                runner.prices.map(function (price) {
+                    const key = Object.keys(price)[0];
+                    const value = price[key];
+                    const time = parseInt(key);
+                    const runnerToUpdate = eventExport.find(x => x.time === time).runners.find(x => x.name === runner.name);
+                    const back = value.find(x => x.side === "back");
+                    const lay = value.find(x => x.side === "lay");
+                    if (typeof back !== "undefined") {
+                        runnerToUpdate.backOdd = back.odds;
+                        runnerToUpdate.backAvailableAmount = back['available-amount'];
+                    }
+                    if (typeof lay !== "undefined") {
+                        runnerToUpdate.layOdd = lay.odds;
+                        runnerToUpdate.layAvailableAmount = lay['available-amount'];
+                    }
+                });
+            });
+            const eventName = event.name.replace(":", "h");
+            const stream = fs.createWriteStream("export/" + eventName + ".csv");
+            stream.once('open', function (fd) {
+                stream.write("My first row\n");
+                stream.write("My second row\n");
+                stream.end();
+            });
+            console.log(event.name, "done");
+            // console.log(util.inspect(eventExport[1000], false, null, true));
+            // console.log(util.inspect(eventExport[3000], false, null, true));
         });
     };
 
