@@ -97,7 +97,7 @@ function drawRunnerPrices(marketDiv, marketId, datas, name, type, minLine = fals
     let lastLay = 0;
     datas.map(function (price) {
         const time = Object.keys(price)[0];
-        if (time > -600) {
+        if (time > -3600) {
             const details = price[time];
             const finalArray = [time];
             if (minLine) {

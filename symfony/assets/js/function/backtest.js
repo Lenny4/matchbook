@@ -224,7 +224,7 @@ function viewEvent(event, socket) {
             market.runners.map(function (runner, index) {
                 // if (index === 0) {
                 // stockfish(runner);
-                stockfishv2(runner);
+                // stockfishv2(runner);
                 chart.drawRunner(marketDiv, market.id, runner, socket);
                 // }
             });

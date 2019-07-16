@@ -87,7 +87,7 @@ function init() {
                             // });
 
                             // MACHINE LEARNING
-                            const ids = [3];
+                            brain.init();
                         }
                     });
                 } else {
