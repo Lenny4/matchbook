@@ -16,12 +16,14 @@ const MatchbookApi = require('./class/MatchbookApi.js').MatchbookApi;
 const Importer = require('./class/Importer.js').Importer;
 const Backtest = require('./class/Backtest.js').Backtest;
 const LiveBetting = require('./class/LiveBetting.js').LiveBetting;
+const Brain = require('./class/Brain.js').Brain;
 
 const symfonyApi = new SymfonyApi();
 const matchbookApi = new MatchbookApi(Env.USERNAME, Env.PASSWORD, Env.APP_ENV);
 const importer = new Importer(matchbookApi, symfonyApi);
 const liveBetting = new LiveBetting(matchbookApi, symfonyApi);
 const backtest = new Backtest(symfonyApi);
+const brain = new Brain(symfonyApi);
 
 function init() {
     console.log('\033[2J');
