@@ -95,6 +95,65 @@ function drawRunnerPrices(marketDiv, marketId, datas, name, type, minLine = fals
     ];
     let lastBack = 0;
     let lastLay = 0;
+    for (let i = 0; i < 100; i++) {
+        datas.map(function (price, index) {
+            if (index !== 0 && index !== datas.length - 1) {
+                const currentTime = Object.keys(datas[index])[0];
+                if (currentTime > -3600) {
+                    const prevTime = Object.keys(datas[index - 1])[0];
+                    const nextTime = Object.keys(datas[index + 1])[0];
+
+                    const currentValues = datas[index][currentTime];
+                    const prevValues = datas[index - 1][prevTime];
+                    const nextValues = datas[index + 1][nextTime];
+
+                    const currentBack = currentValues.find(x => x.side === "back");
+                    const currentLay = currentValues.find(x => x.side === "lay");
+
+                    const prevBack = prevValues.find(x => x.side === "back");
+                    const prevLay = prevValues.find(x => x.side === "lay");
+
+                    const nextBack = nextValues.find(x => x.side === "back");
+                    const nextLay = nextValues.find(x => x.side === "lay");
+
+                    const backArray = [];
+                    const layArray = [];
+                    if (typeof currentBack !== "undefined") {
+                        backArray.push(currentBack.odds);
+                        backArray.push(currentBack.odds);
+                        if (typeof prevBack !== "undefined") {
+                            backArray.push(prevBack.odds);
+                        }
+                        if (typeof nextBack !== "undefined") {
+                            backArray.push(nextBack.odds);
+                        }
+                        const sumBack = backArray.reduce(function (a, b) {
+                            return a + b;
+                        });
+                        const avgBack = sumBack / backArray.length;
+                        currentBack.odds = avgBack;
+                    }
+
+
+                    if (typeof currentLay !== "undefined") {
+                        layArray.push(currentLay.odds);
+                        layArray.push(currentLay.odds);
+                        if (typeof prevLay !== "undefined") {
+                            layArray.push(prevLay.odds);
+                        }
+                        if (typeof nextLay !== "undefined") {
+                            layArray.push(nextLay.odds);
+                        }
+                        const sumLay = layArray.reduce(function (a, b) {
+                            return a + b;
+                        });
+                        const avgLay = sumLay / layArray.length;
+                        currentLay.odds = avgLay;
+                    }
+                }
+            }
+        });
+    }
     datas.map(function (price) {
         const time = Object.keys(price)[0];
         if (time > -3600) {
