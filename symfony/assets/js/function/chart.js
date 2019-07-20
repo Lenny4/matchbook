@@ -165,13 +165,13 @@ function drawRunnerPrices(marketDiv, marketId, datas, name, type, minLine = fals
                         return (prev.odd > current.odd) ? prev : current
                     });
                     if (typeof maxBack !== "undefined") {
-                        finalArray.push(maxBack[type]);
+                        finalArray.push(1 / maxBack[type]);
                         lastBack = maxBack[type];
                     } else {
-                        finalArray.push(lastBack);
+                        finalArray.push(1 /lastBack);
                     }
                 } else {
-                    finalArray.push(lastBack);
+                    finalArray.push(1 /lastBack);
                 }
                 // if (details.filter(x => x.side === "lay").length > 0) {
                 //     const minLay = details.filter(x => x.side === "lay").reduce(function (prev, current) {

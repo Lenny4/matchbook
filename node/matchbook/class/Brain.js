@@ -5,7 +5,7 @@ const brain = require('brain.js');
 function Brain(symfonyApi) {
     this.symfonyApi = symfonyApi;
     this.nbRunners = 6;
-    this.smoothTime = 1;
+    this.smoothTime = 1000;
     this.net = [];
 
     this.init = function () {
@@ -78,9 +78,6 @@ function Brain(symfonyApi) {
                                     });
                                     const avgBack = sumBack / backArray.length;
                                     currentBack.odds = avgBack;
-                                    if (i === $this.smoothTime - 1) {
-                                        currentBack.odds = parseInt(currentBack.odds * 100) / 100;
-                                    }
                                 }
 
 
@@ -98,9 +95,6 @@ function Brain(symfonyApi) {
                                     });
                                     const avgLay = sumLay / layArray.length;
                                     currentLay.odds = avgLay;
-                                    if (i === $this.smoothTime - 1) {
-                                        currentLay.odds = parseInt(currentLay.odds * 100) / 100;
-                                    }
                                 }
                             }
                         }
@@ -168,16 +162,35 @@ function Brain(symfonyApi) {
                 // ================================================
                 const startTrain = parseInt(new Date().getTime() / 1000);
                 console.log("[" + id + "] start train ...");
-                console.log(eventExport[1]);
                 const net = new brain.recurrent.LSTMTimeStep({
-                    inputSize: 3,
-                    hiddenLayers: [3, 10],
-                    outputSize: 3
+                    inputSize: $this.nbRunners,
+                    hiddenLayers: [10, 20, 30],
+                    outputSize: $this.nbRunners,
                 });
+                const training = [];
+                eventExport.map(function (obj) {
+                    const tempTraining = [];
+                    let isComplete = true;
+                    obj.runners.map(function (runner) {
+                        if (runner.backOdd < 1) {
+                            isComplete = false;
+                        } else {
+                            tempTraining.push(parseInt(1 / runner.backOdd * 100) / 100);
+                        }
+                    });
+                    if (isComplete) {
+                        training.push(tempTraining);
+                    }
+                });
+                const stats = net.train(training, {log: (status) => console.log(status)});
+                const endTrain = parseInt(new Date().getTime() / 1000);
+                const trainTime = startTrain - endTrain;
+                console.log("[" + id + "] trained in " + trainTime + " s", stats);
                 $this.net.push(net);
                 callback();
             });
         } else {
+            console.log("[" + id + "] not enough runners");
             callback();
         }
     };

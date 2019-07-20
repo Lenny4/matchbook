@@ -6,8 +6,6 @@ function LiveBetting(matchbookApi, symfonyApi) {
     this.isRunning = false;
     this.matchbookApi = matchbookApi;
     this.autoBetIsRunning = false;
-    this.symfonyApi = symfonyApi;
-    this.autoImportConfig = Env.AUTO_IMPORT_CONFIF;
 
     this.start = function (callback) {
         const $this = this;
