@@ -13,6 +13,7 @@ const Const = {
     API_TEST: 'api-doc-test-client',
     GET_SESSION_URL: 'https://api.matchbook.com/bpapi/rest/security/session',
     LOGIN_URL: 'https://api.matchbook.com/bpapi/rest/security/session',
+    SUBMIT_OFFERS_URL: 'https://api.matchbook.com/edge/rest/v2/offers',
     GET_SPORTS_URL: 'https://api.matchbook.com/edge/rest/lookups/sports',
     GET_EVENTS_URL: 'https://api.matchbook.com/edge/rest/events',
     //Symfony

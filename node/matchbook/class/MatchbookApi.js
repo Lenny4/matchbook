@@ -14,6 +14,7 @@ function MatchbookApi(username, password, env) {
     // urls
     this.GetSessionUrl = Const.GET_SESSION_URL;
     this.LoginUrl = Const.LOGIN_URL;
+    this.SubmitOffersUrl = Const.SUBMIT_OFFERS_URL;
     this.GetSportsUrl = Const.GET_SPORTS_URL;
     this.getEventsUrl = Const.GET_EVENTS_URL;
 
@@ -196,6 +197,30 @@ function MatchbookApi(username, password, env) {
             }
         });
     };
+
+    this.submitOffers = function (obj, callback) {
+        const $this = this;
+        console.log('Logging to matchbook API ...');
+        const options = {
+            method: Const.POST,
+            url: $this.SubmitOffersUrl,
+            json: obj,
+            headers: $this.headers,
+        };
+        request(options, function (error, response, body) {
+            if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
+                console.log('Submit Offers OK !', response.statusCode);
+                callback(body);
+            } else {//error
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Error while submit offer !', response.statusCode);
+                }
+                callback(false);
+            }
+        });
+    }
 }
 
 module.exports = {
