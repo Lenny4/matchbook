@@ -16,6 +16,7 @@ const Const = {
     SUBMIT_OFFERS_URL: 'https://api.matchbook.com/edge/rest/v2/offers',
     GET_SPORTS_URL: 'https://api.matchbook.com/edge/rest/lookups/sports',
     GET_EVENTS_URL: 'https://api.matchbook.com/edge/rest/events',
+    GET_SETTLED_BETS: 'https://api.matchbook.com/edge/rest/reports/v2/bets/settled',
     //Symfony
     SYMFONY_SAVE_EVENT: Env.SYMFONY_BASE_URL + "save-event",
     SYMFONY_GET_EVENT: Env.SYMFONY_BASE_URL + "get-event",

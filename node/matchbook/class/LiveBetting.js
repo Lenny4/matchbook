@@ -26,6 +26,7 @@ function LiveBetting(matchbookApi, symfonyApi) {
             {name: "after", value: now},
         ];
         $this.matchbookApi.getEventsView(data, function (events) {
+            //todo yaura une erreur ici faire comme dans martingale
             events.events.map(function (event) {
                 const start = parseInt(new Date(event.start).getTime() / 1000);
                 if (start - now < 3600 && start - now > 1400) {

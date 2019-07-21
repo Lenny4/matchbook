@@ -17,6 +17,7 @@ function MatchbookApi(username, password, env) {
     this.SubmitOffersUrl = Const.SUBMIT_OFFERS_URL;
     this.GetSportsUrl = Const.GET_SPORTS_URL;
     this.getEventsUrl = Const.GET_EVENTS_URL;
+    this.getSettledBetUrl = Const.GET_SETTLED_BETS;
 
     this.login = function (env, callback = null) {
         const $this = this;
@@ -200,7 +201,7 @@ function MatchbookApi(username, password, env) {
 
     this.submitOffers = function (obj, callback) {
         const $this = this;
-        console.log('Logging to matchbook API ...');
+        // console.log('Submitting offer ...', obj);
         const options = {
             method: Const.POST,
             url: $this.SubmitOffersUrl,
@@ -209,18 +210,47 @@ function MatchbookApi(username, password, env) {
         };
         request(options, function (error, response, body) {
             if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
-                console.log('Submit Offers OK !', response.statusCode);
+                // console.log('Submit Offers OK !', response.statusCode);
                 callback(body);
             } else {//error
                 if (error) {
                     console.log(error);
                 } else {
-                    console.log('Error while submit offer !', response.statusCode);
+                    console.log('Error while submit offer !', response.statusCode, body.offers[0].errors);
                 }
                 callback(false);
             }
         });
-    }
+    };
+
+    this.getSettledBet = function (ids, callback) {
+        const $this = this;
+        // console.log('Get settled bets ...');
+        ids = ids.join();
+        const options = {
+            method: Const.GET,
+            url: $this.getSettledBetUrl,
+            qs: {
+                offset: '0',
+                'per-page': '100',
+                'event-ids': ids,
+            },
+            headers: $this.headers,
+        };
+        request(options, function (error, response, body) {
+            if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
+                // console.log('Get Settled Bets OK !', response.statusCode);
+                callback(JSON.parse(body));
+            } else {//error
+                callback(false);
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Get Settled Bets KO !', response.statusCode);
+                }
+            }
+        });
+    };
 }
 
 module.exports = {
