@@ -5,10 +5,10 @@ function Martingale(matchbookApi, symfonyApi) {
     this.events = [];
     this.matchbookApi = matchbookApi;
     this.loss = 0;
-    this.betAmount = 1;//EUR min 2
-    this.startBefore = 600;//TODO change
-    this.startAfter = 60;//TODO change
-    this.maxGlobalOdd = 1.02;//1.02 //TODO change
+    this.betAmount = 1;//EUR min 1
+    this.startBefore = 600;
+    this.startAfter = 60;
+    this.maxGlobalOdd = 1.02;
     this.lowLimitOdd = 0.85;
     this.highLimitOdd = 0.95;
     this.minAmountMatchbook = 0.1;//EUR

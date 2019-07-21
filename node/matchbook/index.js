@@ -18,6 +18,7 @@ const Backtest = require('./class/Backtest.js').Backtest;
 const LiveBetting = require('./class/LiveBetting.js').LiveBetting;
 const Martingale = require('./class/Martingale.js').Martingale;
 const Brain = require('./class/Brain.js').Brain;
+const JustBet = require('./class/JustBet.js').JustBet;
 
 const symfonyApi = new SymfonyApi();
 const matchbookApi = new MatchbookApi(Env.USERNAME, Env.PASSWORD, Env.APP_ENV);
@@ -26,6 +27,7 @@ const liveBetting = new LiveBetting(matchbookApi, symfonyApi);
 const martingale = new Martingale(matchbookApi, symfonyApi);
 const backtest = new Backtest(symfonyApi);
 const brain = new Brain(symfonyApi);
+const justBet = new JustBet(matchbookApi);
 
 function init() {
     console.log('\033[2J');
@@ -47,7 +49,8 @@ function init() {
                             }, 30000);
                         } else {
                             importer.init();
-                            martingale.start();
+                            justBet.start();
+                            // martingale.start();
                             // RSI TEST
                             // let percent = 0;
                             // const ids = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];

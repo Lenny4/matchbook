@@ -149,6 +149,7 @@ function MatchbookApi(username, password, env) {
                 'sport-ids': data.find(x => x.name === "sport-ids").value,
                 'exchange-type': 'back-lay',
                 'include-prices': 'false',
+                'price-depth': 1
             },
             headers: $this.headers,
         };
