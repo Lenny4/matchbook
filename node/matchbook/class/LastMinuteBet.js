@@ -47,9 +47,17 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
 
     this.updateThisEvents = function (events, now, callback) {
         const $this = this;
+        const indexToDelete = [];
         $this.events.map(function (myEvent, indexEvent) {
             const event = events.find(x => x.id === myEvent.id);
             const time = myEvent.start - now;
+            if (time < 10) {
+                if (typeof event !== "undefined") {
+                    console.log(event.name, time, event.status, myEvent.name);
+                } else {
+                    console.log(typeof event, myEvent.name);
+                }
+            }
             if (typeof event !== "undefined" && event.status === "open") {
                 if (time < 10) {
                     myEvent.runners.map(function (myRunner) {
@@ -75,10 +83,14 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
                     });
                 }
             } else {
-                const eventToSave = JSON.parse(JSON.stringify(myEvent));
-                $this.events.splice(indexEvent, 1);
-                $this.saveEvent(eventToSave);
+                indexToDelete.push(indexEvent);
             }
+        });
+        indexToDelete.map(function (index) {
+            console.log(1);
+            const eventToSave = JSON.parse(JSON.stringify($this.events[index]));
+            $this.events.splice(index, 1);
+            $this.saveEvent(eventToSave);
         });
         callback();
     };
