@@ -36,6 +36,9 @@ class ApiController extends AbstractController
             $name = $request->request->get('name');
             $start = intval($request->request->get('start'));
             $sportId = $request->request->get('sport-id');
+            if ($sportId === null) {
+                $sportId = "";
+            }
             $event = $request->request->get('event');
             $eventEntity = new Event();
             $eventJsonEntity = new EventJson();

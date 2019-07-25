@@ -20,7 +20,7 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
             if (typeof events !== "undefined" && events.total > 0) {
                 $this.addEventsToThisEvents(events.events, now, function () {
                     $this.updateThisEvents(events.events, now, function () {
-                        console.log(util.inspect($this.events, false, null, true));
+                        // console.log(util.inspect($this.events, false, null, true));
 
 
                         //watch again
@@ -35,6 +35,9 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
                     });
                 });
             } else {
+                if (typeof events !== "undefined" && events.total === 0) {
+                    setTimeoutS = 1000 * 600;
+                }
                 setTimeout(function () {
                     $this.watch();
                 }, setTimeoutS);
@@ -44,37 +47,47 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
 
     this.updateThisEvents = function (events, now, callback) {
         const $this = this;
-        $this.events.map(function (myEvent) {
+        $this.events.map(function (myEvent, indexEvent) {
             const event = events.find(x => x.id === myEvent.id);
-            if (typeof event !== "undefined") {
-                const time = myEvent.start - now;
-                myEvent.runners.map(function (myRunner) {
-                    const runner = event.markets[0].runners.find(x => x.id === myRunner.id);
-                    let push = {
-                        time: time,
-                        back: 0,
-                        lay: 0,
-                    };
-                    if (typeof runner !== "undefined") {
-                        const back = runner.prices.find(x => x.side === "back");
-                        const lay = runner.prices.find(x => x.side === "lay");
-                        if (typeof back !== "undefined") {
-                            push.back = back.odds;
+            const time = myEvent.start - now;
+            if (typeof event !== "undefined" && event.status === "open") {
+                if (time < 10) {
+                    myEvent.runners.map(function (myRunner) {
+                        const runner = event.markets[0].runners.find(x => x.id === myRunner.id);
+                        let push = {
+                            time: time,
+                            back: 0,
+                            lay: 0,
+                        };
+                        if (typeof runner !== "undefined") {
+                            const back = runner.prices.find(x => x.side === "back");
+                            const lay = runner.prices.find(x => x.side === "lay");
+                            if (typeof back !== "undefined") {
+                                push.back = back.odds;
+                            }
+                            if (typeof lay !== "undefined") {
+                                push.lay = lay.odds;
+                            }
+                            myRunner.prices.push(push);
+                        } else {
+                            myRunner.prices.push(push);
                         }
-                        if (typeof back !== "undefined") {
-                            push.lay = lay.odds;
-                        }
-                        myRunner.prices.push(push);
-                    } else {
-                        myRunner.prices.push(push);
-                    }
-                });
+                    });
+                }
             } else {
-                console.log("delete", myEvent);
-                //TODO delete my Event and save in bdd if saveData === true
+                const eventToSave = JSON.parse(JSON.stringify(myEvent));
+                $this.events.splice(indexEvent, 1);
+                $this.saveEvent(eventToSave);
             }
         });
         callback();
+    };
+
+    this.saveEvent = function (event) {
+        const $this = this;
+        if ($this.saveData === true) {
+            $this.symfonyApi.saveEvent(event, true);
+        }
     };
 
     this.addEventsToThisEvents = function (events, now, callback) {
@@ -100,6 +113,7 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
                         }
                     });
                     if (newEvent.runners.length > 0) {
+                        console.log(newEvent.name, "start to record soon");
                         $this.events.push(newEvent);
                     }
                 }

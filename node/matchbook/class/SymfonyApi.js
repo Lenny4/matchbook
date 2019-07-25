@@ -6,16 +6,20 @@ function SymfonyApi() {
     this.saveEventUrl = Const.SYMFONY_SAVE_EVENT;
     this.getEventUrl = Const.SYMFONY_GET_EVENT;
 
-    this.saveEvent = function (event) {
+    this.saveEvent = function (event, afterRace = false) {
         const $this = this;
         console.log("Sending " + event.id + " event to " + $this.saveEventUrl);
-        $this.request({
-                id: event.id,
-                name: event.name,
-                start: event.start,
-                'sport-id': event['sport-id'],
-                event: JSON.stringify(event),
-            }, $this.saveEventUrl, function (err, httpResponse, body) {
+        let data = {
+            id: event.id,
+            name: event.name,
+            start: event.start,
+            afterRace: afterRace,
+            event: JSON.stringify(event),
+        };
+        if (typeof event['sport-id'] !== "undefined") {
+            data['sport-id'] = event['sport-id'];
+        }
+        $this.request(data, $this.saveEventUrl, function (err, httpResponse, body) {
                 if (typeof httpResponse !== "undefined" && typeof httpResponse.statusCode !== "undefined" && httpResponse.statusCode === 200) {
                     console.log(event.id + " has been added to database !", body);
                 } else {
