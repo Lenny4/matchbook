@@ -143,19 +143,21 @@ function MatchbookApi(username, password, env) {
         if (!noLog) console.log('Getting Events View ...', data);
         const after = data.find(x => x.name === "after").value;
         const before = parseInt(after) + (3600 * 24 * 3);//3 days
+        let qs = {
+            offset: '0',
+            'per-page': '100',
+            after: after,
+            before: before.toString(),
+            'sport-ids': data.find(x => x.name === "sport-ids").value,
+            'exchange-type': 'back-lay',
+            'include-prices': 'false',
+            'states': 'open',
+            'price-depth': 1
+        };
         const options = {
             method: Const.GET,
             url: $this.getEventsUrl,
-            qs: {
-                offset: '0',
-                'per-page': '100',
-                after: after,
-                before: before.toString(),
-                'sport-ids': data.find(x => x.name === "sport-ids").value,
-                'exchange-type': 'back-lay',
-                'include-prices': 'false',
-                'price-depth': 1
-            },
+            qs: qs,
             headers: $this.headers,
         };
         request(options, function (error, response, body) {

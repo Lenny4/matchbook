@@ -9,8 +9,6 @@ function SymfonyApi() {
     this.saveEvent = function (event) {
         const $this = this;
         console.log("Sending " + event.id + " event to " + $this.saveEventUrl);
-        // console.log(util.inspect(event, false, null, true));
-        // console.log(util.inspect(JSON.stringify(event), false, null, true));
         $this.request({
                 id: event.id,
                 name: event.name,

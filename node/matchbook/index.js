@@ -19,6 +19,7 @@ const LiveBetting = require('./class/LiveBetting.js').LiveBetting;
 const Martingale = require('./class/Martingale.js').Martingale;
 const Brain = require('./class/Brain.js').Brain;
 const JustBet = require('./class/JustBet.js').JustBet;
+const LastMinuteBet = require('./class/LastMinuteBet.js').LastMinuteBet;
 
 const symfonyApi = new SymfonyApi();
 const matchbookApi = new MatchbookApi(Env.USERNAME, Env.PASSWORD, Env.APP_ENV);
@@ -28,6 +29,7 @@ const martingale = new Martingale(matchbookApi, symfonyApi);
 const backtest = new Backtest(symfonyApi);
 const brain = new Brain(symfonyApi);
 const justBet = new JustBet(matchbookApi);
+const lastMinuteBet = new LastMinuteBet(matchbookApi, symfonyApi, true);
 
 function init() {
     console.log('\033[2J');
@@ -48,6 +50,7 @@ function init() {
                                 init();
                             }, 30000);
                         } else {
+                            lastMinuteBet.watch();
                             // importer.init();
                             // justBet.start();
                             // martingale.start();
