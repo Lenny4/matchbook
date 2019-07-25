@@ -48,8 +48,8 @@ function init() {
                                 init();
                             }, 30000);
                         } else {
-                            importer.init();
-                            justBet.start();
+                            // importer.init();
+                            // justBet.start();
                             // martingale.start();
                             // RSI TEST
                             // let percent = 0;
@@ -95,7 +95,7 @@ function init() {
                             // MACHINE LEARNING
                             // brain.init();
                         }
-                    });
+                    }, true);//todo remove true
                 } else {
                     console.log('APP_ENV can only be "prod" or "dev", please change and restart server');
                 }

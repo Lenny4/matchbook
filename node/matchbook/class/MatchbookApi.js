@@ -19,61 +19,66 @@ function MatchbookApi(username, password, env) {
     this.getEventsUrl = Const.GET_EVENTS_URL;
     this.getSettledBetUrl = Const.GET_SETTLED_BETS;
 
-    this.login = function (env, callback = null) {
+    this.login = function (env, callback = null, dontLogin = false) {
         const $this = this;
         console.log('Logging to matchbook API ...');
-        if (env === Const.PROD) { // prod
-            const options = {
-                method: Const.POST,
-                url: $this.LoginUrl,
-                json: {
-                    "username": $this.username,
-                    "password": $this.password
-                },
-                headers: $this.headers,
-            };
-            request(options, function (error, response, body) {
-                if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
-                    $this.connected = Date.now() + (3600 * 5);//now + 5 hours
-                    $this.headers['session-token'] = body['session-token'];
-                    console.log('Logging to matchbook API OK !', response.statusCode, "token", body['session-token']);
-                    callback(true);
-                } else {//error
-                    $this.connected = null;
-                    delete $this.headers['session-token'];
-                    if (error) {
-                        console.log(error);
-                    } else {
-                        console.log('Logging to matchbook API KO !', response.statusCode);
+        if (dontLogin === false) {
+            if (env === Const.PROD) { // prod
+                const options = {
+                    method: Const.POST,
+                    url: $this.LoginUrl,
+                    json: {
+                        "username": $this.username,
+                        "password": $this.password
+                    },
+                    headers: $this.headers,
+                };
+                request(options, function (error, response, body) {
+                    if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
+                        $this.connected = Date.now() + (3600 * 5);//now + 5 hours
+                        $this.headers['session-token'] = body['session-token'];
+                        console.log('Logging to matchbook API OK !', response.statusCode, "token", body['session-token']);
+                        callback(true);
+                    } else {//error
+                        $this.connected = null;
+                        delete $this.headers['session-token'];
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            console.log('Logging to matchbook API KO !', response.statusCode);
+                        }
+                        callback(false);
                     }
-                    callback(false);
-                }
-            });
-            setTimeout(function () {
-                $this.login(env);
-            }, (3600 * 5 * 1000));
-        } else { // dev
-            const options = {
-                method: Const.GET,
-                url: $this.GetSessionUrl,
-                headers: $this.headers,
-            };
-            request(options, function (error, response, body) {
-                if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
-                    $this.connected = Date.now() + (3600 * 5);//now + 5 hours
-                    console.log('Get Session to matchbook API OK !', response.statusCode);
-                    if (callback !== null) callback(true);
-                } else {
-                    $this.connected = null;
-                    delete $this.headers['session-token'];
-                    if (error) {
-                        console.log(error);
+                });
+                setTimeout(function () {
+                    $this.login(env);
+                }, (3600 * 5 * 1000));
+            } else { // dev
+                const options = {
+                    method: Const.GET,
+                    url: $this.GetSessionUrl,
+                    headers: $this.headers,
+                };
+                request(options, function (error, response, body) {
+                    if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
+                        $this.connected = Date.now() + (3600 * 5);//now + 5 hours
+                        console.log('Get Session to matchbook API OK !', response.statusCode);
+                        if (callback !== null) callback(true);
                     } else {
-                        console.log('Logging to matchbook API KO !', response.statusCode);
+                        $this.connected = null;
+                        delete $this.headers['session-token'];
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            console.log('Logging to matchbook API KO !', response.statusCode);
+                        }
+                        if (callback !== null) callback(false);
                     }
-                    if (callback !== null) callback(false);
-                }
-            });
+                });
+            }
+        } else {
+            console.log("not really login");
+            callback(true);
         }
     };
 
