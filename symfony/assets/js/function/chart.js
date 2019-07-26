@@ -168,10 +168,10 @@ function drawRunnerPrices(marketDiv, marketId, datas, name, type, minLine = fals
                         finalArray.push(1 / maxBack[type]);
                         lastBack = maxBack[type];
                     } else {
-                        finalArray.push(1 /lastBack);
+                        finalArray.push(1 / lastBack);
                     }
                 } else {
-                    finalArray.push(1 /lastBack);
+                    finalArray.push(1 / lastBack);
                 }
                 // if (details.filter(x => x.side === "lay").length > 0) {
                 //     const minLay = details.filter(x => x.side === "lay").reduce(function (prev, current) {
@@ -282,8 +282,44 @@ function drawRunner(marketDiv, marketId, datas, socket) {
     // drawRunnerPrices(marketDiv, marketId, datas.prices, datas.name, "available-amount", true);
 }
 
+function drawEventDashBoard(event, div) {
+    event.runners.map(function (runner) {
+        const array = [
+            ['Time', 'back', 'lay']
+        ];
+        runner.prices.map(function (price, index) {
+            const time = price.time.toString();
+            let lay = price.lay;
+            let back = price.back;
+            if (lay === 0) {
+                lay = null;
+            }
+            if (back === 0) {
+                back = null;
+            } else if (back > 30) {
+                back = 30;
+            }
+            array.push([time, back, lay]);
+        });
+        const data = google.visualization.arrayToDataTable(array);
+        const options = {
+            title: runner.name + " lay",
+            curveType: 'function',
+            legend: {position: 'bottom'},
+            width: 400,
+            height: 200,
+            chartArea: {left: 10, top: 20, width: "100%", height: "100%"},
+        };
+        const idChart = runner.id + event.id + "_lay";
+        const chartDiv = $("<div class='chart' id='" + idChart + "'></div>").appendTo(div);
+        const chart = new google.visualization.LineChart(document.getElementById(idChart));
+        chart.draw(data, options);
+    });
+}
+
 module.exports = {
     drawVolumeMarket,
     drawBackLayGlobal,
     drawRunner,
+    drawEventDashBoard,
 };

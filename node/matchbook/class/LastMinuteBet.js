@@ -17,27 +17,36 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
             {name: "after", value: (now - 1200)},
         ];
         $this.matchbookApi.getEventsView(data, function (events) {
-            if (typeof events !== "undefined" && events.total > 0) {
-                $this.addEventsToThisEvents(events.events, now, function () {
-                    $this.updateThisEvents(events.events, now, function () {
-                        // console.log(util.inspect($this.events, false, null, true));
+            events.events = events.events.filter(x => x["allow-live-betting"] === true);
+            const eventStart = parseInt(new Date(events.events[0].start).getTime() / 1000);
+            if ((typeof events !== "undefined" && events.total > 0) || $this.events.length > 0) {
+                if (now - eventStart < 600) {
+                    $this.addEventsToThisEvents(events.events, now, function () {
+                        $this.updateThisEvents(events.events, now, function () {
+                            // console.log(util.inspect($this.events, false, null, true));
 
 
-                        //watch again
-                        const beforeTimeOut = new Date().getTime();
-                        setTimeoutS = setTimeoutS - (beforeTimeOut - nowTimeOut);
-                        if (setTimeoutS < 0) {
-                            setTimeoutS = 0;
-                        }
-                        setTimeout(function () {
-                            $this.watch();
-                        }, setTimeoutS);
+                            //watch again
+                            const beforeTimeOut = new Date().getTime();
+                            setTimeoutS = setTimeoutS - (beforeTimeOut - nowTimeOut);
+                            if (setTimeoutS < 0) {
+                                setTimeoutS = 0;
+                            }
+                            setTimeout(function () {
+                                $this.watch();
+                            }, setTimeoutS);
+                        });
                     });
-                });
-            } else {
-                if (typeof events !== "undefined" && events.total === 0) {
-                    setTimeoutS = 1000 * 600;
+                } else {
+                    if (typeof events !== "undefined" && events.total === 0) {
+                        setTimeoutS = 1000 * 600;
+                    }
+                    setTimeout(function () {
+                        $this.watch();
+                    }, setTimeoutS);
                 }
+            } else {
+                setTimeoutS = 60 * 1000;
                 setTimeout(function () {
                     $this.watch();
                 }, setTimeoutS);
@@ -51,7 +60,7 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
         $this.events.map(function (myEvent, indexEvent) {
             const event = events.find(x => x.id === myEvent.id);
             const time = myEvent.start - now;
-            if (time < 10) {
+            if (time < 1) {
                 if (typeof event !== "undefined") {
                     console.log(event.name, time, event.status, myEvent.name);
                 } else {
@@ -59,22 +68,47 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
                 }
             }
             if (typeof event !== "undefined" && event.status === "open") {
-                if (time < 10) {
+                if (time < 1) {
                     myEvent.runners.map(function (myRunner) {
                         const runner = event.markets[0].runners.find(x => x.id === myRunner.id);
                         let push = {
                             time: time,
-                            back: 0,
-                            lay: 0,
+                            back: null,
+                            back2: null,
+                            lay: null,
+                            lay2: null,
                         };
                         if (typeof runner !== "undefined") {
-                            const back = runner.prices.find(x => x.side === "back");
-                            const lay = runner.prices.find(x => x.side === "lay");
-                            if (typeof back !== "undefined") {
-                                push.back = back.odds;
+                            const backs = runner.prices.filter(x => x.side === "back");
+                            const lays = runner.prices.filter(x => x.side === "lay");
+                            if (backs.length > 0) {
+                                const back = backs.reduce(function (prev, current) {
+                                    return (prev.y > current.y) ? prev : current
+                                });
+                                const back2 = backs.reduce(function (prev, current) {
+                                    return (prev.y < current.y) ? prev : current
+                                });
+                                if (typeof back !== "undefined") {
+                                    push.back = back.odds;
+                                }
+                                if (typeof back2 !== "undefined") {
+                                    push.back2 = back2.odds;
+                                }
                             }
-                            if (typeof lay !== "undefined") {
-                                push.lay = lay.odds;
+                            if (lays.length > 0) {
+                                const lay = lays.reduce(function (prev, current) {
+                                    return (prev.y < current.y) ? prev : current
+                                });
+                                const lay2 = lays.reduce(function (prev, current) {
+                                    return (prev.y > current.y) ? prev : current
+                                });
+
+                                if (typeof lay !== "undefined") {
+                                    push.lay = lay.odds;
+                                }
+                                if (typeof lay2 !== "undefined") {
+                                    push.lay2 = lay2.odds;
+                                }
                             }
                             myRunner.prices.push(push);
                         } else {
@@ -106,7 +140,7 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
         const $this = this;
         events.map(function (event) {
             const eventStart = parseInt(new Date(event.start).getTime() / 1000);
-            if (eventStart - now > 10 && eventStart - now < 600) {
+            if (eventStart - now > 10 && eventStart - now < 600 && event["allow-live-betting"] === true) {
                 if (typeof $this.events.find(x => x.id === event.id) === "undefined") {
                     let newEvent = {
                         id: event.id,

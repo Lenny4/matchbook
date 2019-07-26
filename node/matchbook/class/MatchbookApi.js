@@ -152,7 +152,7 @@ function MatchbookApi(username, password, env) {
             'exchange-type': 'back-lay',
             'include-prices': 'false',
             'states': 'open',
-            'price-depth': 1
+            'price-depth': 2
         };
         const options = {
             method: Const.GET,

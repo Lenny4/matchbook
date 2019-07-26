@@ -9,6 +9,7 @@ const dev = require('./function/dev.js');
 const importer = require('./function/importer.js');
 const backtest = require('./function/backtest.js');
 const liveBetting = require('./function/live-betting.js');
+const dashboard = require('./function/dashboard.js');
 //console.log(util.inspect(myObject, false, null, true))
 const util = require('util');
 
@@ -18,6 +19,8 @@ $(document).ready(function () {
     $("body").tooltip({
         selector: '[data-toggle="tooltip"]'
     });
+
+    dashboard.showBacktestDashboard();
 
     const socket = io(socketServer);
     socket.emit('get_sports', {}, function (result) {
