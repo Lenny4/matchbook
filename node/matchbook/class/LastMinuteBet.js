@@ -17,8 +17,8 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
             {name: "after", value: (now - 1200)},
         ];
         $this.matchbookApi.getEventsView(data, function (events) {
-            if ((typeof events !== "undefined" && events.total > 0) || $this.events.length > 0) {
-                events.events = events.events.filter(x => x["allow-live-betting"] === true);
+            events.events = events.events.filter(x => x["allow-live-betting"] === true);
+            if ((typeof events !== "undefined" && events.events.length > 0) || $this.events.length > 0) {
                 const eventStart = parseInt(new Date(events.events[0].start).getTime() / 1000);
                 if (now - eventStart < 600) {
                     $this.addEventsToThisEvents(events.events, now, function () {
@@ -60,6 +60,11 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
         $this.events.map(function (myEvent, indexEvent) {
             const event = events.find(x => x.id === myEvent.id);
             const time = myEvent.start - now;
+            // FOR DEV
+            let name = "undefined";
+            if (typeof event !== "undefined") name = event.name;
+            console.log(time, event, time, typeof event !== "undefined", event.status === "open");
+            // FOR DEV
             if (typeof event !== "undefined" && event.status === "open") {
                 if (time < 1) {
                     myEvent.runners.map(function (myRunner) {

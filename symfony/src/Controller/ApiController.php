@@ -68,6 +68,27 @@ class ApiController extends AbstractController
     }
 
     /**
+     * @Route("/change-winner", name="change_winner")
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function changeWinner(Request $request)
+    {
+        $winnerId = $request->request->get('winnerId');
+        $eventId = $request->request->get('eventId');
+        $em = $this->getDoctrine()->getManager();
+        $eventRepository = $em->getRepository("App\Entity\Event");
+        $event = $eventRepository->findOneByEventId($eventId);
+        if ($event instanceof Event) {
+            $event->setWinner(strval($winnerId));
+            $em->persist($event);
+            $em->flush();
+            return $this->json(true);
+        }
+        return $this->json(false);
+    }
+
+    /**
      * @Route("/get-event", name="get_event")
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
