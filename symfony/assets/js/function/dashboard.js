@@ -43,11 +43,11 @@ function showBacktestDashboard() {
 
 const backArray = {
     backFast: function (runnerF, indexPriceF) {
-        const back = runnerF.prices[indexPriceF];
-        const prevBack = runnerF.prices[indexPriceF - 1];
-        if (back.back !== null && prevBack !== null && back.time === prevBack.time - 1) {
-            const invBack = 1 / back.back;
-            const prevInvBack = 1 / prevBack.back;
+        const price = runnerF.prices[indexPriceF];
+        const prevPrice = runnerF.prices[indexPriceF - 1];
+        if (price.back !== null && prevPrice.back !== null && price.time === prevPrice.time - 1) {
+            const invBack = 1 / price.back;
+            const prevInvBack = 1 / prevPrice.back;
             //si la cote est inférieur à 2
             if (invBack > 0.53) {
                 //si la cote est 2 fois inférieur à la précédente cote
@@ -61,17 +61,36 @@ const backArray = {
         return false;
     },
     backMedium: function (runnerF, indexPriceF) {
-        const back = runnerF.prices[indexPriceF];
-        const prevBack = runnerF.prices[indexPriceF - 1];
-        const prevBack2 = runnerF.prices[indexPriceF - 2];
-        if (back.back !== null && prevBack.back !== null && prevBack2.back !== null && back.time === prevBack.time - 1 && back.time === prevBack2.time - 2) {
-            const invBack = 1 / back.back;
-            const prevInvBack = 1 / prevBack.back;
-            const prevInvBack2 = 1 / prevBack2.back;
+        const price = runnerF.prices[indexPriceF];
+        const prevPrice = runnerF.prices[indexPriceF - 1];
+        const prevPrice2 = runnerF.prices[indexPriceF - 2];
+        if (price.back !== null && prevPrice.back !== null && prevPrice2.back !== null && price.time === prevPrice.time - 1 && price.time === prevPrice2.time - 2) {
+            const invBack = 1 / price.back;
+            const prevInvBack = 1 / prevPrice.back;
+            const prevInvBack2 = 1 / prevPrice2.back;
             if (invBack > 0.5) {
                 if ((prevInvBack / invBack) < 0.8 && (prevInvBack2 / prevInvBack) < 0.8) {
                     return true;
                 }
+            }
+        }
+        return false;
+    },
+};
+
+const layArray = {
+    layFast: function (runnerF, indexPriceF) {
+        const price = runnerF.prices[indexPriceF];
+        const prevPrice = runnerF.prices[indexPriceF - 1];
+        if (price.lay !== null && prevPrice.lay !== null && price.time === prevPrice.time - 1) {
+            const invLay = 1 / price.lay;
+            const prevInvLay = 1 / prevPrice.lay;
+            //lay > 40 && lay <= 80
+            if (invLay < 0.025 && invLay >= 0.0125 && invLay / prevInvLay < 0.3) {
+                return true;
+            }
+            if (invLay / prevInvLay < 0.53 && invLay >= 0.02 && invLay < 0.034) {
+                return true;
             }
         }
         return false;
@@ -94,14 +113,25 @@ function betEvent(event) {
                 if (backArray.backFast(runner, indexPrice) === true) {
                     betToAdd.condition = "backFast";
                     delete betToAdd['lay'];
-                    event.bets.push(betToAdd);
+                    if (typeof event.bets.find(x => x.condition === "backFast" && x.name === runner.name) === "undefined") {
+                        event.bets.push(betToAdd);
+                    }
                 }
                 if (backArray.backMedium(runner, indexPrice) === true) {
                     betToAdd.condition = "backMedium";
                     delete betToAdd['lay'];
-                    event.bets.push(betToAdd);
+                    if (typeof event.bets.find(x => x.condition === "backMedium" && x.name === runner.name) === "undefined") {
+                        event.bets.push(betToAdd);
+                    }
                 }
                 //FOR LAY
+                if (layArray.layFast(runner, indexPrice) === true) {
+                    betToAdd.condition = "layFast";
+                    delete betToAdd['back'];
+                    if (typeof event.bets.find(x => x.condition === "layFast" && x.name === runner.name) === "undefined") {
+                        event.bets.push(betToAdd);
+                    }
+                }
             }
         });
     });
