@@ -17,9 +17,9 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
             {name: "after", value: (now - 1200)},
         ];
         $this.matchbookApi.getEventsView(data, function (events) {
-            events.events = events.events.filter(x => x["allow-live-betting"] === true);
-            const eventStart = parseInt(new Date(events.events[0].start).getTime() / 1000);
             if ((typeof events !== "undefined" && events.total > 0) || $this.events.length > 0) {
+                events.events = events.events.filter(x => x["allow-live-betting"] === true);
+                const eventStart = parseInt(new Date(events.events[0].start).getTime() / 1000);
                 if (now - eventStart < 600) {
                     $this.addEventsToThisEvents(events.events, now, function () {
                         $this.updateThisEvents(events.events, now, function () {
@@ -63,49 +63,52 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
             if (typeof event !== "undefined" && event.status === "open") {
                 if (time < 1) {
                     myEvent.runners.map(function (myRunner) {
-                        const runner = event.markets[0].runners.find(x => x.id === myRunner.id);
-                        let push = {
-                            time: time,
-                            back: null,
-                            back2: null,
-                            lay: null,
-                            lay2: null,
-                        };
-                        if (typeof runner !== "undefined") {
-                            const backs = runner.prices.filter(x => x.side === "back");
-                            const lays = runner.prices.filter(x => x.side === "lay");
-                            if (backs.length > 0) {
-                                const back = backs.reduce(function (prev, current) {
-                                    return (prev.odds > current.odds) ? prev : current
-                                });
-                                const back2 = backs.reduce(function (prev, current) {
-                                    return (prev.odds < current.odds) ? prev : current
-                                });
-                                if (typeof back !== "undefined") {
-                                    push.back = back.odds;
+                        const market = event.markets[0];
+                        if (typeof market !== "undefined") {
+                            const runner = market.runners.find(x => x.id === myRunner.id);
+                            let push = {
+                                time: time,
+                                back: null,
+                                back2: null,
+                                lay: null,
+                                lay2: null,
+                            };
+                            if (typeof runner !== "undefined") {
+                                const backs = runner.prices.filter(x => x.side === "back");
+                                const lays = runner.prices.filter(x => x.side === "lay");
+                                if (backs.length > 0) {
+                                    const back = backs.reduce(function (prev, current) {
+                                        return (prev.odds > current.odds) ? prev : current
+                                    });
+                                    const back2 = backs.reduce(function (prev, current) {
+                                        return (prev.odds < current.odds) ? prev : current
+                                    });
+                                    if (typeof back !== "undefined") {
+                                        push.back = back.odds;
+                                    }
+                                    if (typeof back2 !== "undefined") {
+                                        push.back2 = back2.odds;
+                                    }
                                 }
-                                if (typeof back2 !== "undefined") {
-                                    push.back2 = back2.odds;
-                                }
-                            }
-                            if (lays.length > 0) {
-                                const lay = lays.reduce(function (prev, current) {
-                                    return (prev.odds < current.odds) ? prev : current
-                                });
-                                const lay2 = lays.reduce(function (prev, current) {
-                                    return (prev.odds > current.odds) ? prev : current
-                                });
+                                if (lays.length > 0) {
+                                    const lay = lays.reduce(function (prev, current) {
+                                        return (prev.odds < current.odds) ? prev : current
+                                    });
+                                    const lay2 = lays.reduce(function (prev, current) {
+                                        return (prev.odds > current.odds) ? prev : current
+                                    });
 
-                                if (typeof lay !== "undefined") {
-                                    push.lay = lay.odds;
+                                    if (typeof lay !== "undefined") {
+                                        push.lay = lay.odds;
+                                    }
+                                    if (typeof lay2 !== "undefined") {
+                                        push.lay2 = lay2.odds;
+                                    }
                                 }
-                                if (typeof lay2 !== "undefined") {
-                                    push.lay2 = lay2.odds;
-                                }
+                                myRunner.prices.push(push);
+                            } else {
+                                myRunner.prices.push(push);
                             }
-                            myRunner.prices.push(push);
-                        } else {
-                            myRunner.prices.push(push);
                         }
                     });
                 }

@@ -25,3 +25,16 @@
   display: inline-block;
   margin-bottom: 30px;
 }
+
+.event {
+  position: relative;
+  margin-bottom: 50px;
+  width: 100%;
+}
+
+.event select {
+  position: absolute;
+  top: 0;
+  left: 300px;
+  width: 200px;
+}

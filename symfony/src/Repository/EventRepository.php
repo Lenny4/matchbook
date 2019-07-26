@@ -26,7 +26,7 @@ class EventRepository extends ServiceEntityRepository
     public function getAllEvents()
     {
         $dbh = $this->getEntityManager()->getConnection();
-        $sql = "SELECT `id`, `name`, `event_id`, `sport_id`, `start` FROM `event`";
+        $sql = "SELECT `id`, `name`, `event_id`, `sport_id`, `start`, winner FROM `event`";
         $stmt = $dbh->query($sql);
         return $stmt->fetchAll();
     }

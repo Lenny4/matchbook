@@ -32,6 +32,11 @@ class Event
     private $sportId;
 
     /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $winner;
+
+    /**
      * @ORM\Column(type="integer")
      */
     private $start;
@@ -108,5 +113,21 @@ class Event
     public function setJson($json): void
     {
         $this->json = $json;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWinner()
+    {
+        return $this->winner;
+    }
+
+    /**
+     * @param mixed $winner
+     */
+    public function setWinner($winner): void
+    {
+        $this->winner = $winner;
     }
 }

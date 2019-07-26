@@ -111,7 +111,7 @@ function MatchbookApi(username, password, env) {
 
     this.getSports = function (callback) {
         const $this = this;
-        console.log('Getting all sports ...');
+        // console.log('Getting all sports ...');
         const options = {
             method: Const.GET,
             url: $this.GetSportsUrl,
@@ -125,7 +125,7 @@ function MatchbookApi(username, password, env) {
         };
         request(options, function (error, response, body) {
             if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
-                console.log('Get Sports OK !', response.statusCode);
+                // console.log('Get Sports OK !', response.statusCode);
                 callback(JSON.parse(body)['sports']);
             } else {//error
                 callback(false);

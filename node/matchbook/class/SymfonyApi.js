@@ -8,7 +8,7 @@ function SymfonyApi() {
 
     this.saveEvent = function (event, afterRace = false) {
         const $this = this;
-        console.log("Sending " + event.id + " event to " + $this.saveEventUrl);
+        console.log("Sending " + event.name + " event to " + $this.saveEventUrl);
         let data = {
             id: event.id,
             name: event.name,

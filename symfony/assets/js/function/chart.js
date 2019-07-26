@@ -284,38 +284,40 @@ function drawRunner(marketDiv, marketId, datas, socket) {
 
 function drawEventDashBoard(event, div) {
     event.runners.map(function (runner) {
-        const array = [
-            ['Time', 'back', 'lay']
-        ];
-        runner.prices.map(function (price, index) {
-            const time = price.time.toString();
-            let lay = price.lay;
-            let back = price.back;
-            if (lay === 0) {
-                lay = null;
-            } else {
-                lay = 1 / lay;
-            }
-            if (back === 0) {
-                back = null;
-            } else {
-                back = 1 / back;
-            }
-            array.push([time, back, lay]);
-        });
-        const data = google.visualization.arrayToDataTable(array);
-        const options = {
-            title: runner.name,
-            curveType: 'function',
-            legend: {position: 'bottom'},
-            width: 400,
-            height: 200,
-            chartArea: {left: 10, top: 20, width: "100%", height: "100%"},
-        };
-        const idChart = runner.id + event.id + "_lay";
-        const chartDiv = $("<div class='chart' id='" + idChart + "'></div>").appendTo(div);
-        const chart = new google.visualization.LineChart(document.getElementById(idChart));
-        chart.draw(data, options);
+        if (true) {
+            const array = [
+                ['Time', 'back', 'lay']
+            ];
+            runner.prices.map(function (price, index) {
+                const time = price.time.toString();
+                let lay = price.lay;
+                let back = price.back;
+                if (lay === 0) {
+                    lay = null;
+                } else {
+                    lay = 1 / lay;
+                }
+                if (back === 0) {
+                    back = null;
+                } else {
+                    back = 1 / back;
+                }
+                array.push([time, back, lay]);
+            });
+            const data = google.visualization.arrayToDataTable(array);
+            const options = {
+                title: runner.name,
+                curveType: 'function',
+                legend: {position: 'bottom'},
+                width: 400,
+                height: 200,
+                chartArea: {left: 10, top: 20, width: "100%", height: "100%"},
+            };
+            const idChart = runner.id + event.id + "_lay";
+            const chartDiv = $("<div class='chart' id='" + idChart + "'></div>").appendTo(div);
+            const chart = new google.visualization.LineChart(document.getElementById(idChart));
+            chart.draw(data, options);
+        }
     });
 }
 
