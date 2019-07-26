@@ -41,13 +41,84 @@ function showBacktestDashboard() {
     });
 }
 
+const backArray = {
+    backFast: function (runnerF, indexPriceF) {
+        const back = runnerF.prices[indexPriceF].back;
+        const prevBack = runnerF.prices[indexPriceF - 1].back;
+        if (back !== null && prevBack !== null) {
+            const invBack = 1 / back;
+            const prevInvBack = 1 / prevBack;
+            //si la cote est inférieur à 2
+            if (invBack > 0.53) {
+                //si la cote est 2 fois inférieur à la précédente cote
+                if ((prevInvBack / invBack) < 0.5) {
+                    // if (invBack - prevInvBack > 0.07) {
+                    return true;
+                    // }
+                }
+            }
+        }
+        return false;
+    },
+    backMedium: function (runnerF, indexPriceF) {
+        const back = runnerF.prices[indexPriceF].back;
+        const prevBack = runnerF.prices[indexPriceF - 1].back;
+        const prevBack2 = runnerF.prices[indexPriceF - 2].back;
+        if (back !== null && prevBack !== null) {
+            const invBack = 1 / back;
+            const prevInvBack = 1 / prevBack;
+            const prevInvBack2 = 1 / prevBack2;
+            if (invBack > 0.5) {
+                if ((prevInvBack / invBack) < 0.8 && (prevInvBack2 / prevInvBack) < 0.8) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    },
+};
+
+function betEvent(event) {
+    event.bets = [];
+    event.runners.map(function (runner, indexRunner) {
+        runner.prices.map(function (price, indexPrice) {
+            const betToAdd = {
+                condition: null,
+                name: runner.name,
+                back: runner.prices[indexPrice].back,
+                lay: runner.prices[indexPrice].lay,
+                time: runner.prices[indexPrice].time,
+            };
+            if (indexPrice > 3) {
+                //FOR BACK
+                if (backArray.backFast(runner, indexPrice) === true) {
+                    betToAdd.condition = "backFast";
+                    delete betToAdd['lay'];
+                    event.bets.push(betToAdd);
+                }
+                if (backArray.backMedium(runner, indexPrice) === true) {
+                    betToAdd.condition = "backMedium";
+                    delete betToAdd['lay'];
+                    event.bets.push(betToAdd);
+                }
+                //FOR LAY
+            }
+        });
+    });
+    console.log(event);
+}
+
 function getEvents(events, index) {
-    if (index < events.length && index === 0) {
+    if (index < events.length) {
         const url = Env.SYMFONY_URL + Const.SYMFONY_URL_GET_EVENT;
         const desc = events.length - 1 - index;
         $.post(url, {id: events[desc].id}, function (event) {
-            allEvents.push(JSON.parse(event));
-            displayEvent(JSON.parse(event));
+            if (true) {
+                const eventParse = JSON.parse(event);
+                allEvents.push(eventParse);
+                betEvent(eventParse);
+                displayEvent(eventParse);
+            }
             index++;
             getEvents(events, index);
         });
@@ -86,7 +157,7 @@ function displayEvent(event) {
     let date = new Date(event.start * 1000);
     divEvent.append("<h5>" + event.name + " " + date.getDate() + "/" + date.getMonth() + "</h5><button data-log data-event-id='" + event.id + "' type='button' class='btn btn-primary'>Log</button><button data-chart style='left: 570px;' data-event-id='" + event.id + "' type='button' class='btn btn-primary'>Chart</button>" + selectWinner);
     const divChart = $("<div style='display: none;' data-event-id='" + event.id + "' class='chart'></div>").appendTo(divEvent);
-    if (true) {
+    if (false) {
         displayChart(event, divChart);
     }
 }
