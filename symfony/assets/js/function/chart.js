@@ -293,11 +293,13 @@ function drawEventDashBoard(event, div) {
             let back = price.back;
             if (lay === 0) {
                 lay = null;
+            } else {
+                lay = 1 / lay;
             }
             if (back === 0) {
                 back = null;
-            } else if (back > 30) {
-                back = 30;
+            } else {
+                back = 1 / back;
             }
             array.push([time, back, lay]);
         });

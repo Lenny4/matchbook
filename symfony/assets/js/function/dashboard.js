@@ -29,7 +29,6 @@ function getEvents(events, index) {
 }
 
 function allDisplay() {
-    console.log(allEvents[0].runners[0]);
     console.log("done");
 }
 
