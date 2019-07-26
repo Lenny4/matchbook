@@ -303,7 +303,7 @@ function drawEventDashBoard(event, div) {
         });
         const data = google.visualization.arrayToDataTable(array);
         const options = {
-            title: runner.name + " lay",
+            title: runner.name,
             curveType: 'function',
             legend: {position: 'bottom'},
             width: 400,

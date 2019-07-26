@@ -83,10 +83,10 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
                             const lays = runner.prices.filter(x => x.side === "lay");
                             if (backs.length > 0) {
                                 const back = backs.reduce(function (prev, current) {
-                                    return (prev.y > current.y) ? prev : current
+                                    return (prev.odds > current.odds) ? prev : current
                                 });
                                 const back2 = backs.reduce(function (prev, current) {
-                                    return (prev.y < current.y) ? prev : current
+                                    return (prev.odds < current.odds) ? prev : current
                                 });
                                 if (typeof back !== "undefined") {
                                     push.back = back.odds;
@@ -97,10 +97,10 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
                             }
                             if (lays.length > 0) {
                                 const lay = lays.reduce(function (prev, current) {
-                                    return (prev.y < current.y) ? prev : current
+                                    return (prev.odds < current.odds) ? prev : current
                                 });
                                 const lay2 = lays.reduce(function (prev, current) {
-                                    return (prev.y > current.y) ? prev : current
+                                    return (prev.odds > current.odds) ? prev : current
                                 });
 
                                 if (typeof lay !== "undefined") {
@@ -140,7 +140,7 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
         const $this = this;
         events.map(function (event) {
             const eventStart = parseInt(new Date(event.start).getTime() / 1000);
-            if (eventStart - now > 10 && eventStart - now < 600 && event["allow-live-betting"] === true) {
+            if (eventStart - now > 5 && eventStart - now < 600 && event["allow-live-betting"] === true) {
                 if (typeof $this.events.find(x => x.id === event.id) === "undefined") {
                     let newEvent = {
                         id: event.id,

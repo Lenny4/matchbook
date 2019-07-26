@@ -16,7 +16,8 @@ function showBacktestDashboard() {
 function getEvents(events, index) {
     if (index < events.length) {
         const url = Env.SYMFONY_URL + Const.SYMFONY_URL_GET_EVENT;
-        $.post(url, {id: events[index].id}, function (event) {
+        const desc = events.length - 1 - index;
+        $.post(url, {id: events[desc].id}, function (event) {
             allEvents.push(JSON.parse(event));
             displayEvent(JSON.parse(event));
             index++;
