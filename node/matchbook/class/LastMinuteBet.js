@@ -60,11 +60,11 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
         $this.events.map(function (myEvent, indexEvent) {
             const event = events.find(x => x.id === myEvent.id);
             const time = myEvent.start - now;
-            // FOR DEV
+            // TODO FOR DEV
             let name = "undefined";
             if (typeof event !== "undefined") name = event.name;
             console.log(time, event, time, typeof event !== "undefined", event.status === "open");
-            // FOR DEV
+            // TODO FOR DEV
             if (typeof event !== "undefined" && event.status === "open") {
                 if (time < 1) {
                     myEvent.runners.map(function (myRunner) {
@@ -122,9 +122,15 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
             }
         });
         indexToDelete.map(function (index) {
+            // TODO FOR DEV
+            console.log("delete event ", $this.events[index].name, " size : ", $this.events.length);
+            // TODO FOR DEV
             const eventToSave = JSON.parse(JSON.stringify($this.events[index]));
             $this.events.splice(index, 1);
             $this.saveEvent(eventToSave);
+            // TODO FOR DEV
+            console.log("delete event done ", $this.events[index].name, " size : ", $this.events.length);
+            // TODO FOR DEV
         });
         callback();
     };
