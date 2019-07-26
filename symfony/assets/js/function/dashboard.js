@@ -43,11 +43,11 @@ function showBacktestDashboard() {
 
 const backArray = {
     backFast: function (runnerF, indexPriceF) {
-        const back = runnerF.prices[indexPriceF].back;
-        const prevBack = runnerF.prices[indexPriceF - 1].back;
-        if (back !== null && prevBack !== null) {
-            const invBack = 1 / back;
-            const prevInvBack = 1 / prevBack;
+        const back = runnerF.prices[indexPriceF];
+        const prevBack = runnerF.prices[indexPriceF - 1];
+        if (back.back !== null && prevBack !== null && back.time === prevBack.time - 1) {
+            const invBack = 1 / back.back;
+            const prevInvBack = 1 / prevBack.back;
             //si la cote est inférieur à 2
             if (invBack > 0.53) {
                 //si la cote est 2 fois inférieur à la précédente cote
@@ -61,13 +61,13 @@ const backArray = {
         return false;
     },
     backMedium: function (runnerF, indexPriceF) {
-        const back = runnerF.prices[indexPriceF].back;
-        const prevBack = runnerF.prices[indexPriceF - 1].back;
-        const prevBack2 = runnerF.prices[indexPriceF - 2].back;
-        if (back !== null && prevBack !== null) {
-            const invBack = 1 / back;
-            const prevInvBack = 1 / prevBack;
-            const prevInvBack2 = 1 / prevBack2;
+        const back = runnerF.prices[indexPriceF];
+        const prevBack = runnerF.prices[indexPriceF - 1];
+        const prevBack2 = runnerF.prices[indexPriceF - 2];
+        if (back.back !== null && prevBack.back !== null && prevBack2.back !== null && back.time === prevBack.time - 1 && back.time === prevBack2.time - 2) {
+            const invBack = 1 / back.back;
+            const prevInvBack = 1 / prevBack.back;
+            const prevInvBack2 = 1 / prevBack2.back;
             if (invBack > 0.5) {
                 if ((prevInvBack / invBack) < 0.8 && (prevInvBack2 / prevInvBack) < 0.8) {
                     return true;
