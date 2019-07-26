@@ -16,10 +16,21 @@ $(document).on("change", "select[data-event-id]", function () {
     });
 });
 
-$(document).on("click", ".event > button", function () {
+$(document).on("click", ".event > button[data-log]", function () {
     const eventId = $(this).data("event-id");
     const event = allEvents.find(x => x.id === eventId);
     console.log(event);
+});
+
+$(document).on("click", ".event > button[data-chart]", function () {
+    const eventId = $(this).data("event-id");
+    const event = allEvents.find(x => x.id === eventId);
+    const divChart = $(document).find(".chart[data-event-id='" + event.id + "']");
+    if ($(divChart).is(":visible")) {
+        $(divChart).hide();
+    } else {
+        displayChart(event, divChart);
+    }
 });
 
 function showBacktestDashboard() {
@@ -50,6 +61,8 @@ function allDisplay() {
 }
 
 function displayChart(event, div) {
+    $(div).html("");
+    $(div).show();
     chart.drawEventDashBoard(event, div);
 }
 
@@ -71,9 +84,10 @@ function displayEvent(event) {
     });
     selectWinner += "</select>";
     let date = new Date(event.start * 1000);
-    divEvent.append("<h5>" + event.name + " " + date.getDate() + "/" + date.getMonth() + "</h5><button data-event-id='" + event.id + "' type='button' class='btn btn-primary'>Log</button>" + selectWinner);
+    divEvent.append("<h5>" + event.name + " " + date.getDate() + "/" + date.getMonth() + "</h5><button data-log data-event-id='" + event.id + "' type='button' class='btn btn-primary'>Log</button><button data-chart style='left: 570px;' data-event-id='" + event.id + "' type='button' class='btn btn-primary'>Chart</button>" + selectWinner);
+    const divChart = $("<div style='display: none;' data-event-id='" + event.id + "' class='chart'></div>").appendTo(divEvent);
     if (true) {
-        displayChart(event, divEvent);
+        displayChart(event, divChart);
     }
 }
 
