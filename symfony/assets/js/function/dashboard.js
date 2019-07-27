@@ -142,21 +142,20 @@ function betEvent(event, callback) {
 }
 
 function getEvents(events, index) {
+    const offset = 20;
     if (index < events.length) {
         const url = Env.SYMFONY_URL + Const.SYMFONY_URL_GET_EVENT;
         const desc = events.length - 1 - index;
         $.post(url, {id: events[desc].id}, function (event) {
-            if (index === 0) {
-                const eventParse = JSON.parse(event);
-                allEvents.push(eventParse);
-                betEvent(eventParse, function () {
-                    winLose(eventParse, function () {
-                        displayEvent(eventParse);
-                    });
+            const eventParse = JSON.parse(event);
+            allEvents.push(eventParse);
+            betEvent(eventParse, function () {
+                winLose(eventParse, function () {
+                    displayEvent(eventParse);
+                    index++;
+                    getEvents(events, index);
                 });
-            }
-            index++;
-            getEvents(events, index);
+            });
         });
     } else {
         allDisplay();
@@ -202,7 +201,8 @@ function winLose(event, callback) {
 }
 
 function allDisplay() {
-    console.log("global win", globalWin);
+    const percent = parseInt((globalWin / allSmallEvents.length) * 100) / 100;
+    console.log("global win", globalWin, "nb Match", allSmallEvents.length, "%", percent);
 }
 
 function displayChart(event, div) {
