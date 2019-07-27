@@ -4,8 +4,10 @@ const date = require('./date.js');
 const chart = require('./chart.js');
 
 const allEvents = [];
+const mise = 1;
 let allSmallEvents = [];
 const mainDiv = "#liveBettingBacktest";
+let globalWin = 0;
 
 $(document).on("change", "select[data-event-id]", function () {
     const winnerId = $(this).val();
@@ -97,13 +99,14 @@ const layArray = {
     },
 };
 
-function betEvent(event) {
+function betEvent(event, callback) {
     event.bets = [];
     event.runners.map(function (runner, indexRunner) {
         runner.prices.map(function (price, indexPrice) {
             const betToAdd = {
                 condition: null,
                 name: runner.name,
+                runnerId: runner.id,
                 back: runner.prices[indexPrice].back,
                 lay: runner.prices[indexPrice].lay,
                 time: runner.prices[indexPrice].time,
@@ -135,7 +138,7 @@ function betEvent(event) {
             }
         });
     });
-    console.log(event);
+    callback();
 }
 
 function getEvents(events, index) {
@@ -143,11 +146,14 @@ function getEvents(events, index) {
         const url = Env.SYMFONY_URL + Const.SYMFONY_URL_GET_EVENT;
         const desc = events.length - 1 - index;
         $.post(url, {id: events[desc].id}, function (event) {
-            if (true) {
+            if (index === 0) {
                 const eventParse = JSON.parse(event);
                 allEvents.push(eventParse);
-                betEvent(eventParse);
-                displayEvent(eventParse);
+                betEvent(eventParse, function () {
+                    winLose(eventParse, function () {
+                        displayEvent(eventParse);
+                    });
+                });
             }
             index++;
             getEvents(events, index);
@@ -157,8 +163,46 @@ function getEvents(events, index) {
     }
 }
 
+function winLose(event, callback) {
+    event.winLose = 0;
+    let alreadyLay = false;
+    let alreadyBack = false;
+    const winner = allSmallEvents.find(x => x.event_id.toString() === event.id.toString()).winner;
+    if (winner !== null && event.bets.length > 0) {
+        event.bets = event.bets.sort((a, b) => (a.time < b.time) ? 1 : ((b.time < a.time) ? -1 : 0));
+        event.bets.map(function (bet) {
+            const condition = bet.condition;
+            if (condition.search("lay") >= 0 && alreadyLay === false) {
+                alreadyLay = true;
+                if (winner.toString() !== bet.runnerId.toString()) {
+                    event.winLose += mise;
+                    globalWin += mise;
+                } else {
+                    console.log("lose", event.name);
+                    event.winLose -= mise * bet.lay;
+                    globalWin -= mise * bet.lay;
+                }
+            } else if (condition.search("back") >= 0 && alreadyBack === false) {
+                alreadyBack = true;
+                if (winner.toString() === bet.runnerId.toString()) {
+                    event.winLose += mise * bet.back;
+                    globalWin += mise * bet.back;
+                } else {
+                    console.log("lose", event.name);
+                    event.winLose -= mise;
+                    globalWin -= mise;
+                }
+            }
+        });
+        callback();
+    } else {
+        callback();
+    }
+
+}
+
 function allDisplay() {
-    console.log("done");
+    console.log("global win", globalWin);
 }
 
 function displayChart(event, div) {
