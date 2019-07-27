@@ -17,10 +17,12 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
             {name: "after", value: (now - 1200)},
         ];
         $this.matchbookApi.getEventsView(data, function (events) {
-            events.events = events.events.filter(x => x["allow-live-betting"] === true);
-            if ((typeof events !== "undefined" && events.events.length > 0) || $this.events.length > 0) {
+            if (typeof events === "object" && Array.isArray(events.events)) {
+                events.events = events.events.filter(x => x["allow-live-betting"] === true);
+            }
+            if ((typeof events === "object" && events.events.length > 0) || $this.events.length > 0) {
                 const eventStart = parseInt(new Date(events.events[0].start).getTime() / 1000);
-                if (now - eventStart < 600) {
+                if (eventStart - now < 70 || $this.events.length > 0) {
                     $this.addEventsToThisEvents(events.events, now, function () {
                         $this.updateThisEvents(events.events, now, function () {
                             // console.log(util.inspect($this.events, false, null, true));
@@ -38,14 +40,13 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
                         });
                     });
                 } else {
-                    if (typeof events !== "undefined" && events.total === 0) {
-                        setTimeoutS = 1000 * 600;
-                    }
+                    setTimeoutS = 1000 * 60;
                     setTimeout(function () {
                         $this.watch();
                     }, setTimeoutS);
                 }
             } else {
+                console.log("wait 2", setTimeoutS / 1000);
                 setTimeoutS = 60 * 1000;
                 setTimeout(function () {
                     $this.watch();
@@ -60,11 +61,6 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
         $this.events.map(function (myEvent, indexEvent) {
             const event = events.find(x => x.id === myEvent.id);
             const time = myEvent.start - now;
-            // TODO FOR DEV
-            let name = "undefined";
-            if (typeof event !== "undefined") name = event.name;
-            console.log(time, event, time, typeof event !== "undefined", event.status === "open");
-            // TODO FOR DEV
             if (typeof event !== "undefined" && event.status === "open") {
                 if (time < 1) {
                     myEvent.runners.map(function (myRunner) {
@@ -122,15 +118,9 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
             }
         });
         indexToDelete.map(function (index) {
-            // TODO FOR DEV
-            console.log("delete event ", $this.events[index].name, " size : ", $this.events.length);
-            // TODO FOR DEV
             const eventToSave = JSON.parse(JSON.stringify($this.events[index]));
             $this.events.splice(index, 1);
             $this.saveEvent(eventToSave);
-            // TODO FOR DEV
-            console.log("delete event done ", $this.events[index].name, " size : ", $this.events.length);
-            // TODO FOR DEV
         });
         callback();
     };
@@ -146,7 +136,7 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
         const $this = this;
         events.map(function (event) {
             const eventStart = parseInt(new Date(event.start).getTime() / 1000);
-            if (eventStart - now > 5 && eventStart - now < 600 && event["allow-live-betting"] === true) {
+            if (eventStart - now > 5 && eventStart - now < 70 && event["allow-live-betting"] === true) {
                 if (typeof $this.events.find(x => x.id === event.id) === "undefined") {
                     let newEvent = {
                         id: event.id,
