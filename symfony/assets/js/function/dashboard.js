@@ -39,6 +39,7 @@ function showBacktestDashboard() {
     const url = Env.SYMFONY_URL + Const.SYMFONY_URL_GET_ALL_EVENTS;
     $.post(url, function (events) {
         allSmallEvents = events;
+        allSmallEvents = allSmallEvents.sort((a, b) => (parseInt(a.id) < parseInt(b.id)) ? 1 : ((parseInt(b.id) < parseInt(a.id)) ? -1 : 0));
         getEvents(events, 0);
     });
 }
@@ -144,18 +145,24 @@ function betEvent(event, callback) {
 function getEvents(events, index) {
     const offset = 20;
     if (index < events.length) {
-        const url = Env.SYMFONY_URL + Const.SYMFONY_URL_GET_EVENT;
-        const desc = events.length - 1 - index;
-        $.post(url, {id: events[desc].id}, function (event) {
-            const eventParse = JSON.parse(event);
-            allEvents.push(eventParse);
-            betEvent(eventParse, function () {
-                winLose(eventParse, function () {
-                    displayEvent(eventParse);
-                    index++;
-                    getEvents(events, index);
+        const urlIds = Env.SYMFONY_URL + Const.SYMFONY_URL_GET_EVENT_IDS;
+        const ids = [];
+        for (let i = index; i - index < offset && i < events.length; i++) {
+            ids.push(events[i].id);
+        }
+        $.post(urlIds, {ids: ids}, function (result) {
+            result = result.reverse();
+            result.map(function (event) {
+                const eventParse = JSON.parse(event);
+                allEvents.push(eventParse);
+                betEvent(eventParse, function () {
+                    winLose(eventParse, function () {
+                        displayEvent(eventParse);
+                    });
                 });
             });
+            index += offset;
+            getEvents(events, index);
         });
     } else {
         allDisplay();

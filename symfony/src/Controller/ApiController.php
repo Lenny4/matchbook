@@ -107,4 +107,27 @@ class ApiController extends AbstractController
         }
         return $this->json(false);
     }
+
+    /**
+     * @Route("/get-event-ids", name="get_event_ids")
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function getEventIds(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $ids = $request->request->get('ids');
+        $eventJsonRepository = $em->getRepository("App\Entity\EventJson");
+        $eventJsons = $eventJsonRepository->findByMultipleIds($ids);
+        $return = [];
+        if (is_array($eventJsons) AND sizeof($eventJsons) > 0) {
+            foreach ($eventJsons as $eventJson) {
+                if ($eventJson instanceof EventJson) {
+                    array_push($return, $eventJson->getJson());
+                }
+            }
+            return $this->json($return);
+        }
+        return $this->json(false);
+    }
 }

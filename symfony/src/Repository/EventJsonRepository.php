@@ -18,4 +18,12 @@ class EventJsonRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, EventJson::class);
     }
+
+    public function findByMultipleIds(array $ids)
+    {
+        $qb = $this->createQueryBuilder('e');
+        $qb->where($qb->expr()->in('e.id', $ids));
+        $eventJson = $qb->getQuery()->getResult();
+        return $eventJson;
+    }
 }
