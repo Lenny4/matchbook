@@ -44,7 +44,6 @@ function LastMinuteBet(matchbookApi, symfonyApi, saveData = false) {
             } else {
                 if ($this.events.length === 0) {
                     setTimeoutS = 60 * 1000;
-                    console.log("wait 2", setTimeoutS / 1000);
                 }
                 setTimeout(function () {
                     $this.watch();

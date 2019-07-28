@@ -47,58 +47,46 @@ function showBacktestDashboard() {
 }
 
 const backArray = {
-    backFast: function (runnerF, indexPriceF) {
-        const price = runnerF.prices[indexPriceF];
-        const prevPrice = runnerF.prices[indexPriceF - 1];
-        if (price.back !== null && prevPrice.back !== null && price.time === prevPrice.time - 1) {
-            const invBack = 1 / price.back;
-            const prevInvBack = 1 / prevPrice.back;
-            //si la cote est inférieur à 2
-            if (invBack > 0.53) {
-                //si la cote est 2 fois inférieur à la précédente cote
-                if ((prevInvBack / invBack) < 0.5) {
-                    // if (invBack - prevInvBack > 0.07) {
-                    return true;
-                    // }
-                }
-            }
-        }
-        return false;
-    },
-    backMedium: function (runnerF, indexPriceF) {
+    back: function (runnerF, indexPriceF, bets, callback) {
+        // prices
         const price = runnerF.prices[indexPriceF];
         const prevPrice = runnerF.prices[indexPriceF - 1];
         const prevPrice2 = runnerF.prices[indexPriceF - 2];
-        if (price.back !== null && prevPrice.back !== null && prevPrice2.back !== null && price.time === prevPrice.time - 1 && price.time === prevPrice2.time - 2) {
-            const invBack = 1 / price.back;
-            const prevInvBack = 1 / prevPrice.back;
-            const prevInvBack2 = 1 / prevPrice2.back;
-            if (invBack > 0.5) {
-                if ((prevInvBack / invBack) < 0.8 && (prevInvBack2 / prevInvBack) < 0.8) {
-                    return true;
+        // inv
+        const invBack = 1 / price.back;
+        const prevInvBack = 1 / prevPrice.back;
+        const prevInvBack2 = 1 / prevPrice2.back;
+        // condition
+        const last2PricesNotNull = (price.back !== null && prevPrice.back !== null && price.time === prevPrice.time - 1);
+        const last3PricesNotNull = (price.back !== null && prevPrice.back !== null && prevPrice2.back !== null && price.time === prevPrice.time - 1 && price.time === prevPrice2.time - 2);
+        const musts = [
+            //la cote du back doit être inférieur à 2
+            invBack > 0.53
+        ];
+        const conditions = {
+            //la cote doit avoir été divisé par 2 en 1 s
+            backFast: ((prevInvBack / invBack) < 0.5) && last2PricesNotNull,
+            //la cote doit avoir perdu 20% toutes les secondes en 2 s
+            backMedium: ((prevInvBack / invBack) < 0.8 && (prevInvBack2 / prevInvBack) < 0.8) && last3PricesNotNull,
+        };
+        const reducerMust = (accumulator, currentValue) => accumulator && currentValue;
+        if (musts.reduce(reducerMust)) {
+            let alreadyMatch = false;
+            Object.keys(conditions).map(function (key, index) {
+                if (typeof bets.find(x => x.condition === key && x.name === runnerF.name) === "undefined") {
+                    if (conditions[key] === true && alreadyMatch === false) {
+                        alreadyMatch = true;
+                        callback(key);
+                    }
                 }
+            });
+            if (alreadyMatch === false) {
+                callback(false);
             }
+        } else {
+            callback(false);
         }
-        return false;
-    },
-};
 
-const layArray = {
-    layFast: function (runnerF, indexPriceF) {
-        const price = runnerF.prices[indexPriceF];
-        const prevPrice = runnerF.prices[indexPriceF - 1];
-        if (price.lay !== null && prevPrice.lay !== null && price.time === prevPrice.time - 1) {
-            const invLay = 1 / price.lay;
-            const prevInvLay = 1 / prevPrice.lay;
-            //lay > 40 && lay <= 80
-            if (invLay < 0.025 && invLay >= 0.0125 && invLay / prevInvLay < 0.3) {
-                return true;
-            }
-            if (invLay / prevInvLay < 0.53 && invLay >= 0.02 && invLay < 0.034 && prevPrice.lay2 * 1.2 < price.lay2) {
-                return true;
-            }
-        }
-        return false;
     },
 };
 
@@ -116,29 +104,13 @@ function betEvent(event, callback) {
             };
             if (indexPrice > 3) {
                 //FOR BACK
-                if (backArray.backFast(runner, indexPrice) === true) {
-                    betToAdd.condition = "backFast";
-                    delete betToAdd['lay'];
-                    if (typeof event.bets.find(x => x.condition === "backFast" && x.name === runner.name) === "undefined") {
+                backArray.back(runner, indexPrice, event.bets, function (resultBack) {
+                    if (resultBack !== false) {
+                        betToAdd.condition = resultBack;
+                        delete betToAdd['lay'];
                         event.bets.push(betToAdd);
                     }
-                }
-                if (backArray.backMedium(runner, indexPrice) === true) {
-                    betToAdd.condition = "backMedium";
-                    delete betToAdd['lay'];
-                    if (typeof event.bets.find(x => x.condition === "backMedium" && x.name === runner.name) === "undefined") {
-                        event.bets.push(betToAdd);
-                    }
-                }
-                //FOR LAY
-                //on fait que des back c'est plus rentable
-                // if (layArray.layFast(runner, indexPrice) === true) {
-                //     betToAdd.condition = "layFast";
-                //     delete betToAdd['back'];
-                //     if (typeof event.bets.find(x => x.condition === "layFast" && x.name === runner.name) === "undefined") {
-                //         event.bets.push(betToAdd);
-                //     }
-                // }
+                });
             }
         });
     });
