@@ -60,7 +60,7 @@ const backArray = {
         const last2PricesNotNull = (price.back !== null && prevPrice.back !== null && price.time === prevPrice.time - 1);
         const last3PricesNotNull = (price.back !== null && prevPrice.back !== null && prevPrice2.back !== null && price.time === prevPrice.time - 1 && price.time === prevPrice2.time - 2);
         const musts = [
-            //la cote du back doit être inférieur à 2
+            //la cote du back doit être inférieur à 1.89
             invBack > 0.53
         ];
         const conditions = {
@@ -148,30 +148,16 @@ function getEvents(events, index) {
 
 function winLose(event, callback) {
     event.winLose = 0;
-    let alreadyLay = false;
-    let alreadyBack = false;
     const winner = allSmallEvents.find(x => x.event_id.toString() === event.id.toString()).winner;
     if (winner !== null && event.bets.length > 0) {
         event.bets = event.bets.sort((a, b) => (a.time < b.time) ? 1 : ((b.time < a.time) ? -1 : 0));
         event.bets.map(function (bet) {
             const condition = bet.condition;
-            if (condition.search("lay") >= 0 && alreadyLay === false) {
-                alreadyLay = true;
-                if (winner.toString() !== bet.runnerId.toString()) {
-                    event.winLose += mise;
-                    globalWin += mise;
-                } else {
-                    console.log("lose", event.name);
-                    event.winLose -= mise * bet.lay;
-                    globalWin -= mise * bet.lay;
-                }
-            } else if (condition.search("back") >= 0 && alreadyBack === false) {
-                alreadyBack = false;
+            if (condition.search("back") >= 0) {
                 if (winner.toString() === bet.runnerId.toString()) {
                     event.winLose += mise * (bet.back - 1);
                     globalWin += mise * (bet.back - 1);
                 } else {
-                    console.log("lose", event.name);
                     event.winLose -= mise;
                     globalWin -= mise;
                 }
