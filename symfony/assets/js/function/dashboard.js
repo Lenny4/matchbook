@@ -67,8 +67,8 @@ const backArray = {
         }
         // condition
         const lastPricesNotNull = (invBack !== null && price.back !== null);
-        const last2PricesNotNull = (invBack !== null && prevInvBack !== null && price.back !== null && prevPrice.back !== null && price.time === prevPrice.time - 1);
-        const last3PricesNotNull = (invBack !== null && prevInvBack !== null && prevInvBack2 !== null && price.back !== null && prevPrice.back !== null && prevPrice2.back !== null && price.time === prevPrice.time - 1 && price.time === prevPrice2.time - 2);
+        const last2PricesNotNull = lastPricesNotNull && (prevInvBack !== null && prevPrice.back !== null && price.time === prevPrice.time - 1);
+        const last3PricesNotNull = last2PricesNotNull && (prevInvBack2 !== null && prevPrice2.back !== null && price.time === prevPrice2.time - 2);
         const musts = [
             //la cote du back doit être inférieur à 1.89
             invBack > 0.53 && invBack < 0.97
@@ -87,7 +87,7 @@ const backArray = {
         if (musts.reduce(reducerMust)) {
             let alreadyMatch = false;
             Object.keys(conditions).map(function (key, index) {
-                if (typeof bets.find(x => x.condition === key && x.name === runnerF.name) === "undefined") {
+                if (typeof bets.find(x => x.name === runnerF.name) === "undefined") {
                     if (conditions[key] === true && alreadyMatch === false) {
                         alreadyMatch = true;
                         callback(key);
@@ -221,8 +221,9 @@ function allDisplay() {
         dumpBestBet[key].win = parseInt(dumpBestBet[key].win * 100) / 100;
         dumpBestBet[key].percent = parseInt((dumpBestBet[key].win + dumpBestBet[key].lose) / dumpBestBet[key].nb * 100) / 100;
     });
-    console.log(eventsBets, "bet", nbBets, dumpBestBet);
-    console.log(eventsNoBets, "no bet");
+    console.log(eventsBets, dumpBestBet);
+    console.log(nbBets, "bets");
+    console.log(eventsNoBets);
 }
 
 function displayChart(event, div) {
