@@ -47,23 +47,39 @@ function showBacktestDashboard() {
 }
 
 const backArray = {
-    back: function (runnerF, indexPriceF, bets, callback) {
+    back: function (runnerF, indexPriceF, bets, event, callback) {
         // prices
         const price = runnerF.prices[indexPriceF];
         const prevPrice = runnerF.prices[indexPriceF - 1];
         const prevPrice2 = runnerF.prices[indexPriceF - 2];
+        const prevPrice5 = runnerF.prices[indexPriceF - 5];
         // inv
-        const invBack = 1 / price.back;
-        const prevInvBack = 1 / prevPrice.back;
-        const prevInvBack2 = 1 / prevPrice2.back;
+        let invBack = null;
+        if (typeof price !== "undefined") {
+            invBack = 1 / price.back;
+        }
+        let prevInvBack = null;
+        if (typeof prevPrice !== "undefined") {
+            prevInvBack = 1 / prevPrice.back;
+        }
+        let prevInvBack2 = null;
+        if (typeof prevPrice2 !== "undefined") {
+            prevInvBack2 = 1 / prevPrice2.back;
+        }
+        let prevInvBack5 = null;
+        if (typeof prevPrice5 !== "undefined") {
+            prevInvBack5 = 1 / prevPrice5.back;
+        }
         // condition
-        const last2PricesNotNull = (price.back !== null && prevPrice.back !== null && price.time === prevPrice.time - 1);
-        const last3PricesNotNull = (price.back !== null && prevPrice.back !== null && prevPrice2.back !== null && price.time === prevPrice.time - 1 && price.time === prevPrice2.time - 2);
+        const last2PricesNotNull = (invBack !== null && prevInvBack !== null && price.back !== null && prevPrice.back !== null && price.time === prevPrice.time - 1);
+        const last3PricesNotNull = (invBack !== null && prevInvBack !== null && prevInvBack2 !== null && price.back !== null && prevPrice.back !== null && prevPrice2.back !== null && price.time === prevPrice.time - 1 && price.time === prevPrice2.time - 2);
+        const back1And5NotNull = (invBack !== null && prevInvBack5 !== null && price.back !== null && prevInvBack5.back !== null && price.time === prevPrice5.time - 5);
         const musts = [
             //la cote du back doit être inférieur à 1.89
             invBack > 0.53
         ];
         const conditions = {
+            backLow: ((prevInvBack5 > 0.75) && (invBack > 0.92 && invBack < 0.95)) && back1And5NotNull,
             //la cote doit avoir été divisé par 2 en 1 s
             backFast: ((prevInvBack / invBack) < 0.5) && last2PricesNotNull,
             //la cote doit avoir perdu 20% toutes les secondes en 2 s
@@ -86,7 +102,6 @@ const backArray = {
         } else {
             callback(false);
         }
-
     },
 };
 
@@ -97,14 +112,14 @@ function betEvent(event, callback) {
             const betToAdd = {
                 condition: null,
                 name: runner.name,
-                runnerId: runner.id,
                 back: runner.prices[indexPrice].back,
                 lay: runner.prices[indexPrice].lay,
                 time: runner.prices[indexPrice].time,
+                runnerId: runner.id,
             };
             if (indexPrice > 3) {
                 //FOR BACK
-                backArray.back(runner, indexPrice, event.bets, function (resultBack) {
+                backArray.back(runner, indexPrice, event.bets, event, function (resultBack) {
                     if (resultBack !== false) {
                         betToAdd.condition = resultBack;
                         delete betToAdd['lay'];
@@ -168,17 +183,17 @@ function winLose(event, callback) {
         callback();
     }
     let date = new Date(event.start * 1000);
-    if (event.bets.length === 0) {
+    if (event.bets.length === 0 || event.winLose === 0) {
         eventsNoBets.push(event.name + " " + date.getDate() + "/" + date.getMonth());
     } else {
-        eventsBets.push([event.name + " " + date.getDate() + "/" + date.getMonth(), event.bets.length, parseInt(event.winLose * 100) / 100]);
+        eventsBets.push([event.name + " " + date.getDate() + "/" + date.getMonth(), event.bets, parseInt(event.winLose * 1000) / 1000]);
     }
 
 }
 
 function allDisplay() {
-    const percent = parseInt((globalWin / allSmallEvents.length) * 1000) / 1000;
-    console.log("global win", globalWin, "nb Match", allSmallEvents.length, "%", percent);
+    const percent = parseInt((globalWin / allSmallEvents.length) * 10000) / 100;
+    console.log("global win", parseInt(globalWin * 100) / 100, "nb Match", allSmallEvents.length, "%", percent);
     console.log(eventsBets, "bet");
     console.log(eventsNoBets, "no bet");
 }
