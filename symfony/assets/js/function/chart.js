@@ -286,7 +286,7 @@ function drawEventDashBoard(event, div) {
     event.runners.map(function (runner) {
         if (true) {
             const array = [
-                ['Time', 'back', 'lay']
+                ['Time', 'back']
             ];
             runner.prices.map(function (price, index) {
                 const time = price.time.toString();
@@ -302,7 +302,7 @@ function drawEventDashBoard(event, div) {
                 } else {
                     back = 1 / back;
                 }
-                array.push([time, back, lay]);
+                array.push([time, back]);
             });
             const data = google.visualization.arrayToDataTable(array);
             const options = {

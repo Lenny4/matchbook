@@ -8,6 +8,8 @@ const mise = 1;
 let allSmallEvents = [];
 const mainDiv = "#liveBettingBacktest";
 let globalWin = 0;
+const eventsBets = [];
+const eventsNoBets = [];
 
 $(document).on("change", "select[data-event-id]", function () {
     const winnerId = $(this).val();
@@ -92,7 +94,7 @@ const layArray = {
             if (invLay < 0.025 && invLay >= 0.0125 && invLay / prevInvLay < 0.3) {
                 return true;
             }
-            if (invLay / prevInvLay < 0.53 && invLay >= 0.02 && invLay < 0.034) {
+            if (invLay / prevInvLay < 0.53 && invLay >= 0.02 && invLay < 0.034 && prevPrice.lay2 * 1.2 < price.lay2) {
                 return true;
             }
         }
@@ -129,13 +131,14 @@ function betEvent(event, callback) {
                     }
                 }
                 //FOR LAY
-                if (layArray.layFast(runner, indexPrice) === true) {
-                    betToAdd.condition = "layFast";
-                    delete betToAdd['back'];
-                    if (typeof event.bets.find(x => x.condition === "layFast" && x.name === runner.name) === "undefined") {
-                        event.bets.push(betToAdd);
-                    }
-                }
+                //on fait que des back c'est plus rentable
+                // if (layArray.layFast(runner, indexPrice) === true) {
+                //     betToAdd.condition = "layFast";
+                //     delete betToAdd['back'];
+                //     if (typeof event.bets.find(x => x.condition === "layFast" && x.name === runner.name) === "undefined") {
+                //         event.bets.push(betToAdd);
+                //     }
+                // }
             }
         });
     });
@@ -151,16 +154,18 @@ function getEvents(events, index) {
             ids.push(events[i].id);
         }
         $.post(urlIds, {ids: ids}, function (result) {
-            result = result.reverse();
-            result.map(function (event) {
-                const eventParse = JSON.parse(event);
-                allEvents.push(eventParse);
-                betEvent(eventParse, function () {
-                    winLose(eventParse, function () {
-                        displayEvent(eventParse);
+            if (Array.isArray(result)) {
+                result = result.reverse();
+                result.map(function (event) {
+                    const eventParse = JSON.parse(event);
+                    allEvents.push(eventParse);
+                    betEvent(eventParse, function () {
+                        winLose(eventParse, function () {
+                            displayEvent(eventParse);
+                        });
                     });
                 });
-            });
+            }
             index += offset;
             getEvents(events, index);
         });
@@ -189,10 +194,10 @@ function winLose(event, callback) {
                     globalWin -= mise * bet.lay;
                 }
             } else if (condition.search("back") >= 0 && alreadyBack === false) {
-                alreadyBack = true;
+                alreadyBack = false;
                 if (winner.toString() === bet.runnerId.toString()) {
-                    event.winLose += mise * bet.back;
-                    globalWin += mise * bet.back;
+                    event.winLose += mise * (bet.back - 1);
+                    globalWin += mise * (bet.back - 1);
                 } else {
                     console.log("lose", event.name);
                     event.winLose -= mise;
@@ -204,12 +209,20 @@ function winLose(event, callback) {
     } else {
         callback();
     }
+    let date = new Date(event.start * 1000);
+    if (event.bets.length === 0) {
+        eventsNoBets.push(event.name + " " + date.getDate() + "/" + date.getMonth());
+    } else {
+        eventsBets.push([event.name + " " + date.getDate() + "/" + date.getMonth(), event.bets.length, parseInt(event.winLose * 100) / 100]);
+    }
 
 }
 
 function allDisplay() {
-    const percent = parseInt((globalWin / allSmallEvents.length) * 100) / 100;
+    const percent = parseInt((globalWin / allSmallEvents.length) * 1000) / 1000;
     console.log("global win", globalWin, "nb Match", allSmallEvents.length, "%", percent);
+    console.log(eventsBets, "bet");
+    console.log(eventsNoBets, "no bet");
 }
 
 function displayChart(event, div) {
