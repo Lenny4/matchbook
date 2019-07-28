@@ -52,7 +52,6 @@ const backArray = {
         const price = runnerF.prices[indexPriceF];
         const prevPrice = runnerF.prices[indexPriceF - 1];
         const prevPrice2 = runnerF.prices[indexPriceF - 2];
-        const prevPrice5 = runnerF.prices[indexPriceF - 5];
         // inv
         let invBack = null;
         if (typeof price !== "undefined") {
@@ -66,24 +65,23 @@ const backArray = {
         if (typeof prevPrice2 !== "undefined") {
             prevInvBack2 = 1 / prevPrice2.back;
         }
-        let prevInvBack5 = null;
-        if (typeof prevPrice5 !== "undefined") {
-            prevInvBack5 = 1 / prevPrice5.back;
-        }
         // condition
+        const lastPricesNotNull = (invBack !== null && price.back !== null);
         const last2PricesNotNull = (invBack !== null && prevInvBack !== null && price.back !== null && prevPrice.back !== null && price.time === prevPrice.time - 1);
         const last3PricesNotNull = (invBack !== null && prevInvBack !== null && prevInvBack2 !== null && price.back !== null && prevPrice.back !== null && prevPrice2.back !== null && price.time === prevPrice.time - 1 && price.time === prevPrice2.time - 2);
-        const back1And5NotNull = (invBack !== null && prevInvBack5 !== null && price.back !== null && prevInvBack5.back !== null && price.time === prevPrice5.time - 5);
         const musts = [
             //la cote du back doit être inférieur à 1.89
-            invBack > 0.53
+            invBack > 0.53 && invBack < 0.97
         ];
         const conditions = {
-            backLow: ((prevInvBack5 > 0.75) && (invBack > 0.92 && invBack < 0.95)) && back1And5NotNull,
-            //la cote doit avoir été divisé par 2 en 1 s
-            backFast: ((prevInvBack / invBack) < 0.5) && last2PricesNotNull,
-            //la cote doit avoir perdu 20% toutes les secondes en 2 s
-            backMedium: ((prevInvBack / invBack) < 0.8 && (prevInvBack2 / prevInvBack) < 0.8) && last3PricesNotNull,
+            //plus c'est bas mieux c'est car plus permitif
+            backPrevDoesnExist: invBack > 0.744 && prevPrice.back === null,
+            //plus c'est bas mieux c'est car plus permitif
+            backLow: (invBack > 0.910) && lastPricesNotNull,
+            //plus c'est haut mieux c'est car plus permitif, //todo fais perdre de l'argent pour l'instant
+            backFast: ((prevInvBack / invBack) < 0.51) && last2PricesNotNull,
+            //plus c'est haut mieux c'est car plus permitif
+            backMedium: ((prevInvBack / invBack) < 0.914 && (prevInvBack2 / prevInvBack) < 0.805) && last3PricesNotNull,
         };
         const reducerMust = (accumulator, currentValue) => accumulator && currentValue;
         if (musts.reduce(reducerMust)) {
@@ -170,9 +168,11 @@ function winLose(event, callback) {
             const condition = bet.condition;
             if (condition.search("back") >= 0) {
                 if (winner.toString() === bet.runnerId.toString()) {
+                    bet.win = true;
                     event.winLose += mise * (bet.back - 1);
                     globalWin += mise * (bet.back - 1);
                 } else {
+                    bet.win = false;
                     event.winLose -= mise;
                     globalWin -= mise;
                 }
@@ -194,7 +194,34 @@ function winLose(event, callback) {
 function allDisplay() {
     const percent = parseInt((globalWin / allSmallEvents.length) * 10000) / 100;
     console.log("global win", parseInt(globalWin * 100) / 100, "nb Match", allSmallEvents.length, "%", percent);
-    console.log(eventsBets, "bet");
+    let nbBets = 0;
+    const dumpBestBet = {};
+    eventsBets.map(function (event) {
+        nbBets += event[1].length;
+        const bets = event[1];
+        bets.map(function (bet) {
+            const prop = bet.condition;
+            if (!dumpBestBet.hasOwnProperty(bet.condition)) {
+                dumpBestBet[prop] = {
+                    win: 0,
+                    lose: 0,
+                    nb: 0,
+                    percent: null,
+                };
+            }
+            if (bet.win === true) {
+                dumpBestBet[bet.condition].win += mise * (bet.back - 1);
+            } else {
+                dumpBestBet[bet.condition].lose -= mise;
+            }
+            dumpBestBet[bet.condition].nb++;
+        });
+    });
+    Object.keys(dumpBestBet).map(function (key, index) {
+        dumpBestBet[key].win = parseInt(dumpBestBet[key].win * 100) / 100;
+        dumpBestBet[key].percent = parseInt((dumpBestBet[key].win + dumpBestBet[key].lose) / dumpBestBet[key].nb * 100) / 100;
+    });
+    console.log(eventsBets, "bet", nbBets, dumpBestBet);
     console.log(eventsNoBets, "no bet");
 }
 

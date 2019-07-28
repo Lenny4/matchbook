@@ -289,7 +289,7 @@ function drawEventDashBoard(event, div) {
                 ['Time', 'back']
             ];
             runner.prices.map(function (price, index) {
-                const time = price.time.toString();
+                const time = price.time * -1;
                 let lay = price.lay;
                 let back = price.back;
                 if (lay === 0) {
