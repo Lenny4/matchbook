@@ -78,7 +78,7 @@ const backArray = {
             backPrevNotExist: invBack > 0.809 && prevPrice.back === null,
             //plus c'est bas mieux c'est car plus permitif
             backLow: (invBack > 0.910) && lastPricesNotNull,
-            //plus c'est haut mieux c'est car plus permitif, //todo fais perdre de l'argent pour l'instant
+            //plus c'est haut mieux c'est car plus permitif,
             backFast: ((prevInvBack / invBack) < 0.667 && invBack > 0.871) && last2PricesNotNull,
             //plus c'est haut mieux c'est car plus permitif
             backMedium: ((prevInvBack / invBack) < 0.914 && (prevInvBack2 / prevInvBack) < 0.805) && last3PricesNotNull,
