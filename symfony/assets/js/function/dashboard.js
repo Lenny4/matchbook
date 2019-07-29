@@ -75,7 +75,7 @@ const backArray = {
         ];
         const conditions = {
             //plus c'est bas mieux c'est car plus permitif
-            backPrevDoesnExist: invBack > 0.744 && prevPrice.back === null,
+            backPrevNotExist: invBack > 0.809 && prevPrice.back === null,
             //plus c'est bas mieux c'est car plus permitif
             backLow: (invBack > 0.910) && lastPricesNotNull,
             //plus c'est haut mieux c'est car plus permitif, //todo fais perdre de l'argent pour l'instant
@@ -186,7 +186,11 @@ function winLose(event, callback) {
     if (event.bets.length === 0 || event.winLose === 0) {
         eventsNoBets.push(event.name + " " + date.getDate() + "/" + date.getMonth());
     } else {
-        eventsBets.push([event.name + " " + date.getDate() + "/" + date.getMonth(), event.bets, parseInt(event.winLose * 1000) / 1000]);
+        let allBets = "";
+        event.bets.map(function (bet) {
+            allBets += bet.condition;
+        });
+        eventsBets.push([event.name + " " + date.getDate() + "/" + date.getMonth(), allBets, event.bets, parseInt(event.winLose * 1000) / 1000]);
     }
 
 }
@@ -197,8 +201,8 @@ function allDisplay() {
     let nbBets = 0;
     const dumpBestBet = {};
     eventsBets.map(function (event) {
-        nbBets += event[1].length;
-        const bets = event[1];
+        nbBets += event[2].length;
+        const bets = event[2];
         bets.map(function (bet) {
             const prop = bet.condition;
             if (!dumpBestBet.hasOwnProperty(bet.condition)) {
