@@ -23,7 +23,11 @@ function SymfonyApi() {
                 if (typeof httpResponse !== "undefined" && typeof httpResponse.statusCode !== "undefined" && httpResponse.statusCode === 200) {
                     console.log(event.id + " has been added to database !", body);
                 } else {
-                    console.log("Error while saving " + event.id, httpResponse.statusCode);
+                    let statusCode = null;
+                    if (typeof httpResponse !== "undefined") {
+                        statusCode = httpResponse.statusCode;
+                    }
+                    console.log("Error while saving " + event.id, statusCode);
                     console.log("Start to save again in 30s ...");
                     setTimeout(function () {
                         $this.saveEvent(event);
