@@ -81,7 +81,7 @@ const backArray = {
             //plus c'est haut mieux c'est car plus permitif,
             backFast: ((prevInvBack / invBack) < 0.667 && invBack > 0.871) && last2PricesNotNull,
             //plus c'est haut mieux c'est car plus permitif
-            backMedium: ((prevInvBack / invBack) < 0.914 && (prevInvBack2 / prevInvBack) < 0.805) && last3PricesNotNull,
+            backMedium: ((prevInvBack / invBack) < 0.914 && (prevInvBack2 / prevInvBack) < 0.805 && invBack < 0.886) && last3PricesNotNull,
         };
         const reducerMust = (accumulator, currentValue) => accumulator && currentValue;
         if (musts.reduce(reducerMust)) {
