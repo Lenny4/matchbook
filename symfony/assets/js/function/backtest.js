@@ -211,10 +211,11 @@ function calculateEsperance(runners) {
 function viewEvent(event, socket) {
     const div = $("#nav-view");
     $(div).find(".h1").html(event.name);
-    $(div).find(".h2").html(Const.ALL_SPORTS.find(x => x.id === parseInt(event["sport-id"])).name);
+    // $(div).find(".h2").html(Const.ALL_SPORTS.find(x => x.id === parseInt(event["sport-id"])).name);
     $(div).find(".h3").html(date.timestampToHuman(event.start));
     const viewDiv = $(div).find(".view");
     $(viewDiv).html("");
+    console.log(event);
     event.markets.map(function (market, index) {
         if (index === 0) {
             const marketDiv = $("<div class='market' id='" + market.id + "'></div>").appendTo(viewDiv);

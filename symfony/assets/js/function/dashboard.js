@@ -75,13 +75,13 @@ const backArray = {
         ];
         const conditions = {
             //plus c'est bas mieux c'est car plus permitif
-            backPrevNotExist: invBack > 0.809 && prevPrice.back === null,
+            backPrevNotExist: invBack > 0.849 && (prevPrice.back === null || price.time !== prevPrice.time - 1),
             //plus c'est bas mieux c'est car plus permitif
             backLow: (invBack > 0.910) && lastPricesNotNull,
             //plus c'est haut mieux c'est car plus permitif,
             backFast: ((prevInvBack / invBack) < 0.667 && invBack > 0.871) && last2PricesNotNull,
-            //plus c'est haut mieux c'est car plus permitif
-            backMedium: ((prevInvBack / invBack) < 0.914 && (prevInvBack2 / prevInvBack) < 0.805 && invBack < 0.886) && last3PricesNotNull,
+            //plus c'est haut mieux c'est car plus permitif sauf le dernier
+            backMedium: ((prevInvBack / invBack) < 0.914 && (prevInvBack2 / prevInvBack) < 0.805 && invBack < 0.886 && invBack > 0.594) && last3PricesNotNull,
         };
         const reducerMust = (accumulator, currentValue) => accumulator && currentValue;
         if (musts.reduce(reducerMust)) {
@@ -131,7 +131,7 @@ function betEvent(event, callback) {
 }
 
 function getEvents(events, index) {
-    const offset = 20;
+    const offset = 100;
     if (index < events.length) {
         const urlIds = Env.SYMFONY_URL + Const.SYMFONY_URL_GET_EVENT_IDS;
         const ids = [];
@@ -143,12 +143,14 @@ function getEvents(events, index) {
                 result = result.reverse();
                 result.map(function (event) {
                     const eventParse = JSON.parse(event);
-                    allEvents.push(eventParse);
-                    betEvent(eventParse, function () {
-                        winLose(eventParse, function () {
-                            displayEvent(eventParse);
+                    if (![1183505356950023, 1183505334010124].includes(eventParse.id)) {
+                        allEvents.push(eventParse);
+                        betEvent(eventParse, function () {
+                            winLose(eventParse, function () {
+                                displayEvent(eventParse);
+                            });
                         });
-                    });
+                    }
                 });
             }
             index += offset;
@@ -254,7 +256,7 @@ function displayEvent(event) {
     });
     selectWinner += "</select>";
     let date = new Date(event.start * 1000);
-    divEvent.append("<h5>" + event.name + " " + date.getDate() + "/" + date.getMonth() + "</h5><button data-log data-event-id='" + event.id + "' type='button' class='btn btn-primary'>Log</button><button data-chart style='left: 570px;' data-event-id='" + event.id + "' type='button' class='btn btn-primary'>Chart</button>" + selectWinner);
+    divEvent.append("<h5>" + event.name + " " + date.getDate() + "/" + date.getMonth() + 1 + "</h5><button data-log data-event-id='" + event.id + "' type='button' class='btn btn-primary'>Log</button><button data-chart style='left: 570px;' data-event-id='" + event.id + "' type='button' class='btn btn-primary'>Chart</button>" + selectWinner);
     const divChart = $("<div style='display: none;' data-event-id='" + event.id + "' class='chart'></div>").appendTo(divEvent);
     if (false) {
         displayChart(event, divChart);

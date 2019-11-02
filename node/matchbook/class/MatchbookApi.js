@@ -140,6 +140,7 @@ function MatchbookApi(username, password, env) {
 
     this.getEventsView = function (data, callback, noLog = false) {
         const $this = this;
+        let alreadyReturn = false;
         if (!noLog) console.log('Getting Events View ...', data);
         const after = data.find(x => x.name === "after").value;
         const before = parseInt(after) + (3600 * 24 * 3);//3 days
@@ -163,9 +164,15 @@ function MatchbookApi(username, password, env) {
         request(options, function (error, response, body) {
             if (typeof response !== "undefined" && typeof response.statusCode !== "undefined" && response.statusCode === 200) {//200 OK
                 if (!noLog) console.log('Get Events View OK !', response.statusCode);
-                callback(JSON.parse(body));
+                if (alreadyReturn === false) {
+                    alreadyReturn = true;
+                    callback(JSON.parse(body));
+                }
             } else {//error
-                callback(false);
+                if (alreadyReturn === false) {
+                    alreadyReturn = true;
+                    callback(false);
+                }
                 if (error) {
                     console.log(error);
                 } else {
@@ -173,6 +180,13 @@ function MatchbookApi(username, password, env) {
                 }
             }
         });
+        setTimeout(function () {
+            if (alreadyReturn === false) {
+                console.log("force return=================force return=================force return=================");
+                alreadyReturn = true;
+                callback(false);
+            }
+        }, 10 * 1000);
     };
 
     this.getEventsId = function (data, callback, noLog = false) {
