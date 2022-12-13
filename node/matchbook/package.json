@@ -9,7 +9,7 @@
   "dependencies": {
     "asciichart": "^1.5.9",
     "brain.js": "^1.6.1",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "request": "^2.88.0",
     "scrape-it": "^5.1.4",
     "util": "^0.12.0"
